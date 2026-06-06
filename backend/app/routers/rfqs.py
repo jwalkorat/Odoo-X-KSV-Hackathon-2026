@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 import datetime
 from ..database import get_db
-from ..models import RFQ, RFQItem, RFQVendor, Quotation, QuotationItem
+from ..models import RFQ, RFQItem, RFQVendor, Quotation, QuotationItem, Vendor
 from ..schemas import RFQCreate, RFQResponse, QuotationCreate, QuotationResponse
 from ..auth import get_current_user, RoleChecker
 
@@ -16,10 +16,12 @@ vendor_only = RoleChecker(["VENDOR"])
 def get_rfqs(status: Optional[str] = None, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     # If user is a Vendor, they should only see RFQs they are invited to
     if current_user.role == "VENDOR":
-        # Find vendor link
-        # For hackathon simplicity, let's join
-        query = db.query(RFQ).join(RFQVendor).filter(RFQVendor.vendor_id == current_user.id) # Assuming user.id corresponds to vendor_id or mock it
-        # Note: In production you'd map user profile to vendor_id.
+        # Find vendor by contact_email matching current_user.email
+        vendor = db.query(Vendor).filter(Vendor.contact_email == current_user.email).first()
+        if vendor:
+            query = db.query(RFQ).join(RFQVendor).filter(RFQVendor.vendor_id == vendor.id)
+        else:
+            query = db.query(RFQ).join(RFQVendor).filter(RFQVendor.vendor_id == current_user.id)
     else:
         query = db.query(RFQ)
         
