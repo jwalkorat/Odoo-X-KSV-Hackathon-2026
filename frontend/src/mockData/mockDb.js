@@ -2,7 +2,7 @@
 export const MOCK_VENDORS = [
   { id: 1, name: "Nebula IT Solutions", category: "IT", gst_number: "24ABCDE1234F1Z1", contact_email: "nebula@gmail.com", contact_phone: "9876543210", address: "Asteroid Belt Office 404, Sector 7", status: "ACTIVE", rating: 4.8 },
   { id: 2, name: "Supernova Raw Materials Corp", category: "Raw Materials", gst_number: "24XYZAB5678C1Z2", contact_email: "supernova@gmail.com", contact_phone: "9876543211", address: "Quantum Foundry Complex, Sector 9", status: "ACTIVE", rating: 4.5 },
-  { id: 3, name: "Hyperdrive Logistics", category: "Logistics", gst_number: "24QWERTY9012D1Z3", contact_email: "logistics@hyperdrive.com", contact_phone: "9876543212", address: "Docking Bay 12, Gandhinagar Port", status: "ACTIVE", rating: 4.2 },
+  { id: 3, name: "Hyperdrive Logistics", category: "Logistics", gst_number: "24QWERT9012D1Z3", contact_email: "logistics@hyperdrive.com", contact_phone: "9876543212", address: "Docking Bay 12, Gandhinagar Port", status: "ACTIVE", rating: 4.2 },
   { id: 4, name: "Orion Catering Services", category: "Services", gst_number: "24MNBVC3456E1Z4", contact_email: "orion@catering.com", contact_phone: "9876543213", address: "Food Terminal Beta, Sector 3", status: "INACTIVE", rating: 3.9 }
 ];
 

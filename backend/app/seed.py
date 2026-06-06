@@ -83,7 +83,7 @@ def seed_db():
             {
                 "name": "Hyperdrive Logistics",
                 "category": "Logistics",
-                "gst_number": "24QWERTY9012D1Z3",
+                "gst_number": "24QWERT9012D1Z3",
                 "contact_email": "logistics@hyperdrive.com",
                 "contact_phone": "9876543212",
                 "address": "Docking Bay 12, Gandhinagar Port",

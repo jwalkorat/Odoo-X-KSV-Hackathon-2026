@@ -121,13 +121,6 @@ class RFQBase(BaseModel):
     deadline: datetime
     status: Optional[str] = "DRAFT"
 
-    @field_validator("deadline")
-    @classmethod
-    def validate_deadline(cls, value: datetime) -> datetime:
-        if value <= datetime.utcnow():
-            raise ValueError("Deadline must be in the future")
-        return value
-
     @field_validator("status")
     @classmethod
     def validate_rfq_status(cls, value: Optional[str]) -> str:
@@ -145,6 +138,13 @@ class RFQCreate(RFQBase):
     items: List[RFQItemCreate] = Field(..., min_length=1)
     vendor_ids: List[int] = Field(..., min_length=1) # List of Vendor IDs to invite
     attachments: List[RFQAttachment] = []
+
+    @field_validator("deadline")
+    @classmethod
+    def validate_deadline(cls, value: datetime) -> datetime:
+        if value <= datetime.utcnow():
+            raise ValueError("Deadline must be in the future")
+        return value
 
 class RFQResponse(RFQBase):
     id: int

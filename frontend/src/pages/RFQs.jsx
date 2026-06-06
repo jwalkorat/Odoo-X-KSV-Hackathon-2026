@@ -11,6 +11,7 @@ import {
   Edit2,
   FilePlus2,
   Files,
+  Filter,
   PackagePlus,
   Paperclip,
   Plus,
@@ -18,6 +19,7 @@ import {
   Save,
   Search,
   Send,
+  Star,
   ThumbsUp,
   Trash2,
   Users,
@@ -57,6 +59,10 @@ const RFQs = () => {
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [requestingApproval, setRequestingApproval] = useState(null);
+  
+  // Quotation comparison sorting/filtering
+  const [quoteSortBy, setQuoteSortBy] = useState('price_asc');
+  const [quoteMinRating, setQuoteMinRating] = useState(0);
 
   // Vendor quotation form (for VENDOR role)
   const [vendorQuoteForm, setVendorQuoteForm] = useState({});
@@ -507,12 +513,48 @@ const RFQs = () => {
                 {/* Quotations Section — expandable */}
                 {expandedRfqId === rfq.id && (
                   <div className="mt-5 border-t border-violet-500/10 pt-5 space-y-4">
-                    <p className="font-mono text-xs uppercase tracking-widest text-slate-400">
-                      Submitted Quotations
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-violet-500/10 pb-3">
+                      <p className="font-mono text-xs uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                        Submitted Quotations
+                        {quotationsByRfq[rfq.id]?.length > 0 && (
+                          <span className="rounded-full bg-violet-500/20 px-2 py-0.5 text-violet-400 font-bold">{quotationsByRfq[rfq.id].length}</span>
+                        )}
+                      </p>
+                      
                       {quotationsByRfq[rfq.id]?.length > 0 && (
-                        <span className="ml-2 rounded-full bg-violet-500/20 px-2 py-0.5 text-violet-400">{quotationsByRfq[rfq.id].length}</span>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {/* Sort */}
+                          <div className="flex items-center gap-1.5 bg-slate-900 border border-violet-500/10 rounded-lg px-2 py-1 text-xs">
+                            <span className="text-slate-500 font-mono">Sort:</span>
+                            <select
+                              value={quoteSortBy}
+                              onChange={(e) => setQuoteSortBy(e.target.value)}
+                              className="bg-transparent text-slate-300 outline-none cursor-pointer font-medium"
+                            >
+                              <option value="price_asc" className="bg-slate-900 text-slate-300">Price: Low to High</option>
+                              <option value="price_desc" className="bg-slate-900 text-slate-300">Price: High to Low</option>
+                              <option value="delivery_asc" className="bg-slate-900 text-slate-300">Delivery: Fastest</option>
+                              <option value="rating_desc" className="bg-slate-900 text-slate-300">Vendor Rating: High to Low</option>
+                            </select>
+                          </div>
+
+                          {/* Filter */}
+                          <div className="flex items-center gap-1.5 bg-slate-900 border border-violet-500/10 rounded-lg px-2 py-1 text-xs">
+                            <Filter className="h-3 w-3 text-slate-500" />
+                            <span className="text-slate-500 font-mono">Rating:</span>
+                            <select
+                              value={quoteMinRating}
+                              onChange={(e) => setQuoteMinRating(Number(e.target.value))}
+                              className="bg-transparent text-slate-300 outline-none cursor-pointer font-medium"
+                            >
+                              <option value="0" className="bg-slate-900 text-slate-300">All Ratings</option>
+                              <option value="4" className="bg-slate-900 text-slate-300">4.0★ & above</option>
+                              <option value="4.5" className="bg-slate-900 text-slate-300">4.5★ & above</option>
+                            </select>
+                          </div>
+                        </div>
                       )}
-                    </p>
+                    </div>
 
                     {!quotationsByRfq[rfq.id] ? (
                       <p className="text-xs text-slate-500">Loading quotations...</p>
@@ -521,34 +563,67 @@ const RFQs = () => {
                     ) : (() => {
                       const quotes = quotationsByRfq[rfq.id];
                       const lowestPrice = Math.min(...quotes.map((q) => q.total_amount));
+                      
+                      let processedQuotes = [...quotes];
+                      // Filter by rating
+                      if (quoteMinRating > 0) {
+                        processedQuotes = processedQuotes.filter(q => {
+                          const v = vendors.find(vend => vend.id === q.vendor_id);
+                          return v && (v.rating || 0) >= quoteMinRating;
+                        });
+                      }
+                      // Sort
+                      processedQuotes.sort((a, b) => {
+                        if (quoteSortBy === 'price_asc') return a.total_amount - b.total_amount;
+                        if (quoteSortBy === 'price_desc') return b.total_amount - a.total_amount;
+                        if (quoteSortBy === 'delivery_asc') return a.delivery_days - b.delivery_days;
+                        if (quoteSortBy === 'rating_desc') {
+                          const ratingA = vendors.find(vend => vend.id === a.vendor_id)?.rating || 0;
+                          const ratingB = vendors.find(vend => vend.id === b.vendor_id)?.rating || 0;
+                          return ratingB - ratingA;
+                        }
+                        return 0;
+                      });
+
+                      if (processedQuotes.length === 0) {
+                        return <p className="text-xs text-slate-500">No quotations match the filter criteria.</p>;
+                      }
+
                       return (
-                        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                          {quotes.map((quote) => {
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                          {processedQuotes.map((quote) => {
                             const isLowest = quote.total_amount === lowestPrice && quotes.length > 1;
                             const isEditing = editingQuoteId === quote.id;
+                            const vendorObj = vendors.find((v) => v.id === quote.vendor_id);
                             return (
                               <div
                                 key={quote.id}
-                                className={`rounded-lg border p-4 space-y-3 transition-all ${
+                                className={`rounded-xl border p-4 space-y-3 transition-all ${
                                   isLowest
-                                    ? 'border-emerald-400/40 bg-emerald-950/20 ring-1 ring-emerald-400/20'
-                                    : 'border-violet-500/20 bg-slate-950/40'
+                                    ? 'border-emerald-500/40 bg-emerald-950/20 ring-1 ring-emerald-500/20'
+                                    : 'border-violet-500/20 bg-slate-950/40 hover:border-violet-500/30'
                                 }`}
                               >
                                 {/* Header */}
                                 <div className="flex items-start justify-between gap-2">
                                   <div>
-                                    <div className="flex items-center gap-2">
-                                      <p className="font-semibold text-slate-200 text-sm">{vendorName(quote.vendor_id)}</p>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <p className="font-semibold text-slate-200 text-sm">{vendorObj?.name || `Vendor #${quote.vendor_id}`}</p>
+                                      {vendorObj?.rating !== undefined && (
+                                        <span className="flex items-center gap-0.5 rounded bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-400">
+                                          <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" /> {vendorObj.rating.toFixed(1)}
+                                        </span>
+                                      )}
                                       {isLowest && (
                                         <span className="flex items-center gap-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 px-2 py-0.5 text-[9px] font-bold text-emerald-400 uppercase tracking-widest">
                                           <Crown className="h-2.5 w-2.5" /> LOWEST
                                         </span>
                                       )}
                                     </div>
-                                    <p className="text-xs text-slate-500 mt-0.5">Delivery in {quote.delivery_days} days</p>
+                                    <p className="text-xs text-slate-500 mt-1 font-mono">Category: {vendorObj?.category || 'N/A'}</p>
+                                    <p className="text-xs text-slate-400 mt-0.5">Delivery in {quote.delivery_days} days</p>
                                   </div>
-                                  <span className={`shrink-0 rounded-full px-2.5 py-0.5 font-mono text-xs uppercase ${getStatusBadgeClass(quote.status)}`}>
+                                  <span className={`shrink-0 rounded-full px-2.5 py-0.5 font-mono text-[10px] uppercase ${getStatusBadgeClass(quote.status)}`}>
                                     {quote.status}
                                   </span>
                                 </div>
