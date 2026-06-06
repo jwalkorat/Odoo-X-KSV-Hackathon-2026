@@ -4,8 +4,6 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import DashboardLayout from './layouts/DashboardLayout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import RfqsAndQuotes from './pages/RfqsAndQuotes';
-import Approvals from './pages/Approvals';
 import { Terminal, ShieldAlert } from 'lucide-react';
 
 // Protected Route Guard (Checks if user is logged in)
@@ -113,7 +111,11 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <DashboardLayout>
-                  <RfqsAndQuotes />
+                  <WIPPage 
+                    title="RFQ & Quotation Deck" 
+                    assignee="Person 3 (Deepam / Meet / Kashvi)" 
+                    details="Create multi-step RFQs, add dynamic line items, invite vendors, compare side-by-side total costs, and trigger manager approvals."
+                  />
                 </DashboardLayout>
               </ProtectedRoute>
             }
@@ -124,7 +126,11 @@ const App = () => {
               <ProtectedRoute>
                 <RoleGuard allowedRoles={['ADMIN', 'MANAGER']}>
                   <DashboardLayout>
-                    <Approvals />
+                    <WIPPage 
+                      title="Manager Approvals Workflow" 
+                      assignee="Person 3 (Deepam / Meet / Kashvi)" 
+                      details="View pending RFQ approval packages. Approve or reject with written remarks to automatically spin up Purchase Orders."
+                    />
                   </DashboardLayout>
                 </RoleGuard>
               </ProtectedRoute>

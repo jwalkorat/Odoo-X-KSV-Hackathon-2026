@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Text, Enum
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -47,6 +47,7 @@ class RFQ(Base):
     description = Column(Text, nullable=False)
     deadline = Column(DateTime, nullable=False)
     status = Column(String, default="DRAFT") # DRAFT, OPEN, CLOSED, CANCELLED
+    attachments_json = Column(Text, nullable=True) # JSON array of attachment metadata
     created_by_id = Column(Integer, ForeignKey("users.id"))
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 

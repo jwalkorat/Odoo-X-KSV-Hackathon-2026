@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 import datetime
 from ..database import get_db
-from ..models import PurchaseOrder, Invoice, Vendor
+from ..models import PurchaseOrder, Invoice
 from ..schemas import PurchaseOrderResponse, InvoiceResponse, InvoiceCreate
 from ..auth import get_current_user
 
@@ -13,10 +13,8 @@ router = APIRouter(prefix="/api/orders", tags=["Purchase Orders & Invoices"])
 def get_purchase_orders(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     # Vendors should only see their own POs
     if current_user.role == "VENDOR":
-        vendor = db.query(Vendor).filter(Vendor.contact_email == current_user.email).first()
-        if vendor:
-            return db.query(PurchaseOrder).filter(PurchaseOrder.vendor_id == vendor.id).all()
-        return []
+        # Hackathon shortcut - filter by vendor_id matching user.id or handle in logic
+        return db.query(PurchaseOrder).filter(PurchaseOrder.vendor_id == current_user.id).all()
     return db.query(PurchaseOrder).all()
 
 @router.get("/purchase-orders/{po_id}", response_model=PurchaseOrderResponse)
@@ -29,10 +27,7 @@ def get_purchase_order(po_id: int, db: Session = Depends(get_db), current_user =
 @router.get("/invoices", response_model=List[InvoiceResponse])
 def get_invoices(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     if current_user.role == "VENDOR":
-        vendor = db.query(Vendor).filter(Vendor.contact_email == current_user.email).first()
-        if vendor:
-            return db.query(Invoice).filter(Invoice.vendor_id == vendor.id).all()
-        return []
+        return db.query(Invoice).filter(Invoice.vendor_id == current_user.id).all()
     return db.query(Invoice).all()
 
 @router.get("/invoices/{invoice_id}", response_model=InvoiceResponse)

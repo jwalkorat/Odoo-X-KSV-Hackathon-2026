@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 import datetime
-from .database import SessionLocal, engine, Base
-from .models import User, Vendor, RFQ, RFQItem, RFQVendor
-from .auth import get_password_hash
+from database import SessionLocal, engine, Base
+from models import User, Vendor, RFQ, RFQItem, RFQVendor
+from auth import get_password_hash
 
 def seed_db():
     # Make sure tables exist

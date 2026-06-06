@@ -1,7 +1,7 @@
+import json
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
-import datetime
 from ..database import get_db
 from ..models import RFQ, RFQItem, RFQVendor, Quotation, QuotationItem, Vendor
 from ..schemas import RFQCreate, RFQResponse, QuotationCreate, QuotationResponse
@@ -12,29 +12,35 @@ router = APIRouter(prefix="/api/rfqs", tags=["RFQs & Quotations"])
 officer_or_admin = RoleChecker(["OFFICER", "ADMIN"])
 vendor_only = RoleChecker(["VENDOR"])
 
+def serialize_rfq(rfq: RFQ) -> RFQ:
+    rfq.vendor_ids = [link.vendor_id for link in rfq.vendor_links]
+    try:
+        rfq.attachments = json.loads(rfq.attachments_json or "[]")
+    except json.JSONDecodeError:
+        rfq.attachments = []
+    return rfq
+
 @router.get("/", response_model=List[RFQResponse])
 def get_rfqs(status: Optional[str] = None, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     # If user is a Vendor, they should only see RFQs they are invited to
     if current_user.role == "VENDOR":
-        # Find vendor by contact_email matching current_user.email
-        vendor = db.query(Vendor).filter(Vendor.contact_email == current_user.email).first()
-        if vendor:
-            query = db.query(RFQ).join(RFQVendor).filter(RFQVendor.vendor_id == vendor.id)
-        else:
-            query = db.query(RFQ).join(RFQVendor).filter(RFQVendor.vendor_id == current_user.id)
+        # Find vendor link
+        # For hackathon simplicity, let's join
+        query = db.query(RFQ).join(RFQVendor).filter(RFQVendor.vendor_id == current_user.id) # Assuming user.id corresponds to vendor_id or mock it
+        # Note: In production you'd map user profile to vendor_id.
     else:
         query = db.query(RFQ)
         
     if status:
-        query = query.filter(RFQ.status == status)
-    return query.all()
+        query = query.filter(RFQ.status == status.upper())
+    return [serialize_rfq(rfq) for rfq in query.order_by(RFQ.created_at.desc()).all()]
 
 @router.get("/{rfq_id}", response_model=RFQResponse)
 def get_rfq(rfq_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     rfq = db.query(RFQ).filter(RFQ.id == rfq_id).first()
     if not rfq:
         raise HTTPException(status_code=404, detail="RFQ not found")
-    return rfq
+    return serialize_rfq(rfq)
 
 @router.post("/", response_model=RFQResponse, status_code=status.HTTP_201_CREATED)
 def create_rfq(
@@ -42,12 +48,23 @@ def create_rfq(
     db: Session = Depends(get_db), 
     current_user = Depends(officer_or_admin)
 ):
+    vendors = db.query(Vendor).filter(Vendor.id.in_(rfq_in.vendor_ids)).all()
+    found_vendor_ids = {vendor.id for vendor in vendors}
+    missing_vendor_ids = [vendor_id for vendor_id in rfq_in.vendor_ids if vendor_id not in found_vendor_ids]
+    if missing_vendor_ids:
+        raise HTTPException(status_code=400, detail=f"Unknown vendor ids: {missing_vendor_ids}")
+
+    inactive_vendors = [vendor.name for vendor in vendors if vendor.status != "ACTIVE"]
+    if inactive_vendors:
+        raise HTTPException(status_code=400, detail=f"Only active vendors can be assigned: {', '.join(inactive_vendors)}")
+
     # Create RFQ header
     db_rfq = RFQ(
         title=rfq_in.title,
         description=rfq_in.description,
         deadline=rfq_in.deadline,
         status=rfq_in.status,
+        attachments_json=json.dumps([attachment.model_dump() for attachment in rfq_in.attachments]),
         created_by_id=current_user.id
     )
     db.add(db_rfq)
@@ -76,7 +93,7 @@ def create_rfq(
 
     db.commit()
     db.refresh(db_rfq)
-    return db_rfq
+    return serialize_rfq(db_rfq)
 
 @router.post("/{rfq_id}/quotes", response_model=QuotationResponse, status_code=status.HTTP_201_CREATED)
 def submit_quotation(
@@ -90,50 +107,13 @@ def submit_quotation(
     if not rfq:
         raise HTTPException(status_code=404, detail="RFQ not found")
         
-    # Check if a quotation already exists for this vendor and RFQ (Upsert logic)
-    existing_quote = db.query(Quotation).filter(
-        Quotation.rfq_id == rfq_id,
-        Quotation.vendor_id == quote_in.vendor_id
-    ).first()
-
-    if existing_quote:
-        existing_quote.total_amount = quote_in.total_amount
-        existing_quote.delivery_days = quote_in.delivery_days
-        existing_quote.notes = quote_in.notes
-        existing_quote.status = "SUBMITTED"
-        existing_quote.submitted_at = datetime.datetime.utcnow()
-
-        # Delete existing line items
-        db.query(QuotationItem).filter(QuotationItem.quotation_id == existing_quote.id).delete()
-
-        # Create new line items
-        for item in quote_in.items:
-            db_item = QuotationItem(
-                quotation_id=existing_quote.id,
-                rfq_item_id=item.rfq_item_id,
-                unit_price=item.unit_price,
-                total_price=item.total_price
-            )
-            db.add(db_item)
-
-        # Update RFQ-Vendor status
-        link = db.query(RFQVendor).filter(RFQVendor.rfq_id == rfq_id, RFQVendor.vendor_id == quote_in.vendor_id).first()
-        if link:
-            link.status = "RESPONDED"
-
-        db.commit()
-        db.refresh(existing_quote)
-        return existing_quote
-
-    # Create new quotation
     db_quote = Quotation(
         rfq_id=rfq_id,
         vendor_id=quote_in.vendor_id,
         total_amount=quote_in.total_amount,
         delivery_days=quote_in.delivery_days,
         notes=quote_in.notes,
-        status="SUBMITTED",
-        submitted_at=datetime.datetime.utcnow()
+        status="SUBMITTED"
     )
     db.add(db_quote)
     db.commit()
@@ -156,47 +136,3 @@ def submit_quotation(
     db.commit()
     db.refresh(db_quote)
     return db_quote
-
-@router.get("/{rfq_id}/quotes", response_model=List[QuotationResponse])
-def get_rfq_quotations(
-    rfq_id: int,
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
-):
-    rfq = db.query(RFQ).filter(RFQ.id == rfq_id).first()
-    if not rfq:
-        raise HTTPException(status_code=404, detail="RFQ not found")
-    
-    # Vendors should only see their own quote
-    if current_user.role == "VENDOR":
-        return db.query(Quotation).filter(
-            Quotation.rfq_id == rfq_id,
-            Quotation.vendor_id == current_user.id
-        ).all()
-        
-    return db.query(Quotation).filter(Quotation.rfq_id == rfq_id).all()
-
-@router.get("/quotes/all", response_model=List[QuotationResponse])
-def get_all_quotations(
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
-):
-    if current_user.role == "VENDOR":
-        return db.query(Quotation).filter(Quotation.vendor_id == current_user.id).all()
-    return db.query(Quotation).all()
-
-@router.get("/quotes/{quote_id}", response_model=QuotationResponse)
-def get_quotation(
-    quote_id: int,
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
-):
-    quote = db.query(Quotation).filter(Quotation.id == quote_id).first()
-    if not quote:
-        raise HTTPException(status_code=404, detail="Quotation not found")
-        
-    # Vendor permission check
-    if current_user.role == "VENDOR" and quote.vendor_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Clearance level insufficient to view this quotation")
-        
-    return quote

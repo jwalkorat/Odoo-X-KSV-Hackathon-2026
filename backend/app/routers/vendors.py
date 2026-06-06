@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from typing import List, Optional
 from ..database import get_db
 from ..models import Vendor
-from ..schemas import VendorCreate, VendorResponse
+from ..schemas import VendorCreate, VendorResponse, VendorStatusUpdate
 from ..auth import get_current_user, RoleChecker
 
 router = APIRouter(prefix="/api/vendors", tags=["Vendors"])
@@ -15,6 +16,7 @@ officer_or_admin = RoleChecker(["OFFICER", "ADMIN", "MANAGER"])
 def get_vendors(
     category: Optional[str] = None, 
     status: Optional[str] = None, 
+    search: Optional[str] = None,
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
 ):
@@ -22,8 +24,18 @@ def get_vendors(
     if category:
         query = query.filter(Vendor.category == category)
     if status:
-        query = query.filter(Vendor.status == status)
-    return query.all()
+        query = query.filter(Vendor.status == status.upper())
+    if search:
+        like = f"%{search.strip()}%"
+        query = query.filter(
+            or_(
+                Vendor.name.ilike(like),
+                Vendor.category.ilike(like),
+                Vendor.gst_number.ilike(like),
+                Vendor.contact_email.ilike(like),
+            )
+        )
+    return query.order_by(Vendor.created_at.desc()).all()
 
 @router.get("/{vendor_id}", response_model=VendorResponse)
 def get_vendor(vendor_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
@@ -49,3 +61,18 @@ def create_vendor(
     db.refresh(db_vendor)
     return db_vendor
 
+@router.patch("/{vendor_id}/status", response_model=VendorResponse)
+def update_vendor_status(
+    vendor_id: int,
+    status_in: VendorStatusUpdate,
+    db: Session = Depends(get_db),
+    current_user = Depends(officer_or_admin),
+):
+    vendor = db.query(Vendor).filter(Vendor.id == vendor_id).first()
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+
+    vendor.status = status_in.status
+    db.commit()
+    db.refresh(vendor)
+    return vendor
