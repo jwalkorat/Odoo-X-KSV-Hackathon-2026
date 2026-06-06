@@ -184,9 +184,13 @@ const DashboardLayout = ({ children }) => {
   const filteredNavItems = navItems.filter(item => item.roles.includes(user?.role));
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-950 font-sans">
+    <div className="relative flex h-screen overflow-hidden bg-slate-950 font-sans">
+      {/* Background drifting glow bubbles */}
+      <div className="absolute w-[450px] h-[450px] rounded-full bg-violet-600/5 blur-[120px] top-1/4 left-1/4 -z-10 pointer-events-none animate-space-drift"></div>
+      <div className="absolute w-[450px] h-[450px] rounded-full bg-cyan-500/5 blur-[120px] bottom-1/4 right-1/4 -z-10 pointer-events-none animate-space-drift" style={{ animationDelay: '-10s' }}></div>
+
       {/* Dynamic Cosmic Sidebar */}
-      <aside className="w-64 bg-slate-900/60 border-r border-violet-500/10 flex flex-col justify-between backdrop-blur-xl">
+      <aside className="w-64 bg-slate-900/60 border-r border-violet-500/10 flex flex-col justify-between backdrop-blur-xl shrink-0">
         <div>
           {/* Logo Brand Header */}
           <div className="p-6 border-b border-violet-500/10 flex items-center space-x-3">
@@ -208,10 +212,10 @@ const DashboardLayout = ({ children }) => {
                 <Link
                   key={item.name}
                   to={item.path}
-                  className={`flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm transition-all duration-200 ${
+                  className={`flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm transition-all duration-300 hover:translate-x-1 ${
                     isActive
-                      ? 'bg-gradient-to-r from-violet-600/20 to-cyan-500/10 text-cyan-400 border-l-2 border-cyan-400 font-medium'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                      ? 'bg-gradient-to-r from-violet-600/20 to-cyan-500/10 text-cyan-400 border-l-2 border-cyan-400 font-medium shadow-glow-cyan/5'
+                      : 'text-slate-400 hover:text-cyan-300 hover:bg-slate-800/20'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -248,14 +252,19 @@ const DashboardLayout = ({ children }) => {
 
       {/* Main Command Center Deck */}
       <main className="flex-1 flex flex-col overflow-y-auto">
-        <header className="h-16 border-b border-violet-500/10 flex items-center justify-between px-8 bg-slate-900/10 backdrop-blur-md">
+        <header className="h-16 border-b border-violet-500/10 flex items-center justify-between px-8 bg-slate-900/10 backdrop-blur-md shrink-0">
           <h1 className="text-xl font-outfit font-semibold tracking-wide text-slate-100">
             Sector: <span className="text-cyan-400 font-mono text-lg">{location.pathname === '/' ? 'DASHBOARD' : location.pathname.substring(1).toUpperCase().replace(/-/g, ' ')}</span>
           </h1>
           <div className="flex items-center space-x-4">
             <NotificationBell />
-            <div className="text-xs font-mono text-slate-400">
-              System Status: <span className="text-emerald-400 animate-pulse">● ONLINE</span>
+            <div className="text-[11px] font-mono text-slate-400 flex items-center space-x-2 bg-slate-900/60 border border-violet-500/10 px-3 py-1.5 rounded-full select-none">
+              <span className="text-slate-500">System:</span>
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="text-emerald-400 font-semibold uppercase tracking-wider text-[10px]">ONLINE</span>
             </div>
           </div>
         </header>

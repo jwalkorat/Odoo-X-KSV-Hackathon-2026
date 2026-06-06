@@ -261,29 +261,35 @@ const Vendors = () => {
 
           <div className="grid grid-cols-1 gap-4 2xl:grid-cols-[1fr_330px]">
             <div className="glass-panel overflow-hidden rounded-xl border border-violet-500/15">
-              <div className="grid grid-cols-[1.25fr_.8fr_.7fr_.8fr_120px] gap-4 border-b border-violet-500/10 px-4 py-3 font-mono text-xs uppercase tracking-widest text-slate-500 max-lg:hidden">
-                <span>Vendor</span><span>Category</span><span>GST</span><span>Status</span><span>Toggle</span>
-              </div>
               <div className="max-h-[620px] overflow-y-auto">
+                <div className="sticky top-0 z-10 grid grid-cols-1 lg:grid-cols-12 gap-4 border-b border-violet-500/10 bg-slate-900/95 backdrop-blur-md px-4 py-3 font-mono text-xs uppercase tracking-widest text-slate-500 max-lg:hidden">
+                  <span className="lg:col-span-4">Vendor</span>
+                  <span className="lg:col-span-2">Category</span>
+                  <span className="lg:col-span-3">GST</span>
+                  <span className="lg:col-span-2">Status</span>
+                  <span className="lg:col-span-1 text-right pr-4">Toggle</span>
+                </div>
                 {loading ? (
                   <div className="p-8 text-center text-sm text-slate-400">Syncing vendor registry...</div>
                 ) : vendors.length === 0 ? (
                   <div className="p-8 text-center text-sm text-slate-400">No vendors match this signal.</div>
                 ) : vendors.map((vendor) => (
-                  <button key={vendor.id} type="button" onClick={() => setSelectedVendorId(vendor.id)} className={`grid w-full grid-cols-1 gap-3 border-b border-violet-500/10 px-4 py-4 text-left transition hover:bg-slate-800/30 lg:grid-cols-[1.25fr_.8fr_.7fr_.8fr_120px] lg:items-center ${selectedVendor?.id === vendor.id ? 'bg-cyan-500/5' : ''}`}>
-                    <div>
+                  <div key={vendor.id} onClick={() => setSelectedVendorId(vendor.id)} className={`grid w-full grid-cols-1 gap-4 border-b border-violet-500/10 px-4 py-4 text-left transition hover:bg-slate-800/30 lg:grid-cols-12 lg:items-center cursor-pointer ${selectedVendor?.id === vendor.id ? 'bg-cyan-500/5' : ''}`}>
+                    <div className="lg:col-span-4">
                       <p className="font-semibold text-slate-100">{vendor.name}</p>
                       <p className="mt-1 flex items-center gap-1 text-xs text-slate-500"><Mail className="h-3 w-3" />{vendor.contact_email}</p>
                     </div>
-                    <span className="text-sm text-slate-300">{vendor.category}</span>
-                    <span className="font-mono text-xs text-slate-400">{vendor.gst_number}</span>
-                    <span className={`w-fit rounded-full px-2.5 py-1 font-mono text-xs uppercase ${getStatusBadgeClass(vendor.status)}`}>{vendor.status}</span>
-                    <span onClick={(e) => e.stopPropagation()} className="flex items-center">
+                    <span className="text-sm text-slate-300 lg:col-span-2">{vendor.category}</span>
+                    <span className="font-mono text-xs text-slate-400 lg:col-span-3">{vendor.gst_number}</span>
+                    <span className="lg:col-span-2">
+                      <span className={`w-fit rounded-full px-2.5 py-1 font-mono text-xs uppercase ${getStatusBadgeClass(vendor.status)}`}>{vendor.status}</span>
+                    </span>
+                    <span onClick={(e) => e.stopPropagation()} className="flex items-center lg:col-span-1 lg:justify-end lg:pr-4">
                       <button type="button" onClick={() => toggleStatus(vendor)} className={`relative h-7 w-12 rounded-full border transition ${vendor.status === 'ACTIVE' ? 'border-cyan-400/50 bg-cyan-400/20' : 'border-slate-600 bg-slate-800'}`} aria-label={`Toggle ${vendor.name} status`}>
                         <span className={`absolute top-1 h-5 w-5 rounded-full bg-white transition ${vendor.status === 'ACTIVE' ? 'left-6' : 'left-1'}`} />
                       </button>
                     </span>
-                  </button>
+                  </div>
                 ))}
               </div>
             </div>

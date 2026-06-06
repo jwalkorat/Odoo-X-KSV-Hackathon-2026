@@ -152,10 +152,13 @@ const PurchaseOrders = () => {
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_400px]">
         {/* PO List */}
         <div className="glass-panel overflow-hidden rounded-xl border border-violet-500/15">
-          <div className="grid grid-cols-[1.5fr_1fr_1fr_120px] gap-4 border-b border-violet-500/10 px-4 py-3 font-mono text-xs uppercase tracking-widest text-slate-500 max-lg:hidden">
-            <span>PO Number / RFQ</span><span>Vendor</span><span>Issued Date</span><span>Status</span>
-          </div>
           <div className="max-h-[580px] overflow-y-auto">
+            <div className="sticky top-0 z-10 grid grid-cols-1 lg:grid-cols-12 gap-4 border-b border-violet-500/10 bg-slate-900/95 backdrop-blur-md px-4 py-3 font-mono text-xs uppercase tracking-widest text-slate-500 max-lg:hidden">
+              <span className="lg:col-span-5">PO Number / RFQ</span>
+              <span className="lg:col-span-3">Vendor</span>
+              <span className="lg:col-span-2">Issued Date</span>
+              <span className="lg:col-span-2">Status</span>
+            </div>
             {loading ? (
               <div className="p-8 text-center text-sm text-slate-400">Syncing purchase order registry...</div>
             ) : orders.length === 0 ? (
@@ -170,16 +173,18 @@ const PurchaseOrders = () => {
                 tabIndex={0}
                 onClick={() => setSelectedId(po.id)}
                 onKeyDown={(e) => e.key === 'Enter' && setSelectedId(po.id)}
-                className={`grid grid-cols-1 gap-3 border-b border-violet-500/10 px-4 py-4 text-left transition hover:bg-slate-800/30 lg:grid-cols-[1.5fr_1fr_1fr_120px] lg:items-center cursor-pointer ${selectedId === po.id ? 'bg-cyan-500/5' : ''}`}
+                className={`grid grid-cols-1 gap-4 border-b border-violet-500/10 px-4 py-4 text-left transition hover:bg-slate-800/30 lg:grid-cols-12 lg:items-center cursor-pointer ${selectedId === po.id ? 'bg-cyan-500/5' : ''}`}
               >
-                <div>
+                <div className="lg:col-span-5">
                   <p className="font-mono text-sm font-semibold text-slate-100">{po.po_number}</p>
                   <p className="mt-0.5 text-xs text-slate-500 truncate">{po.rfq_title || `RFQ #${po.rfq_id}`}</p>
                 </div>
-                <p className="text-sm text-slate-300 truncate">{po.vendor_name || `Vendor #${po.vendor_id}`}</p>
-                <p className="text-xs text-slate-400">{formatDate(po.issued_at)}</p>
-                <span className={`w-fit rounded-full px-2.5 py-0.5 font-mono text-xs uppercase ${getStatusBadgeClass(po.status)}`}>
-                  {po.status}
+                <p className="text-sm text-slate-300 truncate lg:col-span-3">{po.vendor_name || `Vendor #${po.vendor_id}`}</p>
+                <p className="text-xs text-slate-400 lg:col-span-2">{formatDate(po.issued_at)}</p>
+                <span className="lg:col-span-2">
+                  <span className={`w-fit rounded-full px-2.5 py-0.5 font-mono text-xs uppercase ${getStatusBadgeClass(po.status)}`}>
+                    {po.status}
+                  </span>
                 </span>
               </div>
             ))}

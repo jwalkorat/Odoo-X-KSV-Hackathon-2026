@@ -128,14 +128,13 @@ const Approvals = () => {
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_390px]">
         {/* List of approvals */}
         <div className="glass-panel overflow-hidden rounded-xl border border-violet-500/15">
-          <div className="grid grid-cols-[1.5fr_1fr_1fr_120px] gap-4 border-b border-violet-500/10 px-4 py-3 font-mono text-xs uppercase tracking-widest text-slate-500 max-lg:hidden">
-            <span>RFQ & Requisition</span>
-            <span>Vendor & Amount</span>
-            <span>Requested By</span>
-            <span>Status</span>
-          </div>
-
           <div className="max-h-[600px] overflow-y-auto">
+            <div className="sticky top-0 z-10 grid grid-cols-1 lg:grid-cols-12 gap-4 border-b border-violet-500/10 bg-slate-900/95 backdrop-blur-md px-4 py-3 font-mono text-xs uppercase tracking-widest text-slate-500 max-lg:hidden">
+              <span className="lg:col-span-5">RFQ & Requisition</span>
+              <span className="lg:col-span-3">Vendor & Amount</span>
+              <span className="lg:col-span-2">Requested By</span>
+              <span className="lg:col-span-2">Status</span>
+            </div>
             {loading ? (
               <div className="p-8 text-center text-sm text-slate-400">Syncing approvals ledger...</div>
             ) : approvals.length === 0 ? (
@@ -148,25 +147,25 @@ const Approvals = () => {
                   tabIndex={0}
                   onClick={() => setSelectedId(app.id)}
                   onKeyDown={(e) => e.key === 'Enter' && setSelectedId(app.id)}
-                  className={`grid grid-cols-1 gap-3 border-b border-violet-500/10 px-4 py-4 text-left transition hover:bg-slate-800/30 lg:grid-cols-[1.5fr_1fr_1fr_120px] lg:items-center ${
+                  className={`grid grid-cols-1 gap-4 border-b border-violet-500/10 px-4 py-4 text-left transition hover:bg-slate-800/30 lg:grid-cols-12 lg:items-center cursor-pointer ${
                     selectedId === app.id ? 'bg-cyan-500/5' : ''
                   }`}
                 >
-                  <div>
+                  <div className="lg:col-span-5">
                     <p className="font-semibold text-slate-100 truncate">{app.rfq_title || `RFQ Requisition #${app.rfq_id}`}</p>
                     <p className="mt-1 text-xs text-slate-500">Requested: {formatDate(app.created_at)}</p>
                   </div>
-                  <div>
+                  <div className="lg:col-span-3">
                     <p className="text-sm text-slate-200 truncate">{app.vendor_name || `Vendor #${app.vendor_id}`}</p>
                     <p className="mt-0.5 text-xs text-cyan-400 font-mono">{formatCurrency(app.total_amount || 0)}</p>
                   </div>
-                  <div>
+                  <div className="lg:col-span-2">
                     <span className="flex items-center gap-1.5 text-xs text-slate-400">
                       <User className="h-3 w-3 text-violet-400" />
                       {app.requested_by_username || `Officer #${app.requested_by_id}`}
                     </span>
                   </div>
-                  <div>
+                  <div className="lg:col-span-2">
                     <span className={`inline-block rounded-full px-2.5 py-0.5 font-mono text-xs uppercase ${getStatusBadgeClass(app.status)}`}>
                       {app.status}
                     </span>

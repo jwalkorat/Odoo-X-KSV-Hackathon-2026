@@ -226,7 +226,10 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         
         {/* Active RFQs */}
-        <div className="glass-panel rounded-xl p-6 border border-violet-500/10 flex items-center justify-between">
+        <div 
+          onClick={() => navigate('/rfqs')}
+          className="glass-panel premium-card-hover rounded-xl p-6 border border-violet-500/10 flex items-center justify-between cursor-pointer"
+        >
           <div>
             <span className="text-xs font-mono tracking-wider text-slate-400 uppercase">Active RFQs</span>
             <h3 className="text-3xl font-outfit font-extrabold text-slate-100 mt-1">{stats.activeRfqs}</h3>
@@ -237,7 +240,10 @@ const Dashboard = () => {
         </div>
 
         {/* Pending Approvals */}
-        <div className="glass-panel rounded-xl p-6 border border-violet-500/10 flex items-center justify-between">
+        <div 
+          onClick={() => navigate('/approvals')}
+          className="glass-panel premium-card-hover rounded-xl p-6 border border-violet-500/10 flex items-center justify-between cursor-pointer"
+        >
           <div>
             <span className="text-xs font-mono tracking-wider text-slate-400 uppercase">Pending Approvals</span>
             <h3 className="text-3xl font-outfit font-extrabold text-slate-100 mt-1">{stats.pendingApprovals}</h3>
@@ -248,7 +254,10 @@ const Dashboard = () => {
         </div>
 
         {/* POs This Month */}
-        <div className="glass-panel rounded-xl p-6 border border-violet-500/10 flex items-center justify-between">
+        <div 
+          onClick={() => navigate('/purchase-orders')}
+          className="glass-panel premium-card-hover rounded-xl p-6 border border-violet-500/10 flex items-center justify-between cursor-pointer"
+        >
           <div>
             <span className="text-xs font-mono tracking-wider text-slate-400 uppercase">POs This Month</span>
             <h3 className="text-3xl font-outfit font-extrabold text-slate-100 mt-1">
@@ -261,7 +270,10 @@ const Dashboard = () => {
         </div>
 
         {/* Overdue Invoices */}
-        <div className="glass-panel rounded-xl p-6 border border-violet-500/10 flex items-center justify-between">
+        <div 
+          onClick={() => navigate('/invoices')}
+          className="glass-panel premium-card-hover rounded-xl p-6 border border-violet-500/10 flex items-center justify-between cursor-pointer"
+        >
           <div>
             <span className="text-xs font-mono tracking-wider text-slate-400 uppercase">Overdue Invoices</span>
             <h3 className="text-3xl font-outfit font-extrabold text-red-400 mt-1">{stats.overdueInvoices}</h3>
@@ -295,7 +307,7 @@ const Dashboard = () => {
                 {recentPos.length === 0 ? (
                   <tr><td colSpan={4} className="py-6 text-center text-xs text-slate-500 font-mono">No purchase orders issued yet</td></tr>
                 ) : recentPos.map((po, index) => (
-                  <tr key={index} onClick={() => navigate('/purchase-orders')} className="hover:bg-violet-900/20 transition-all duration-150 cursor-pointer group">
+                  <tr key={index} onClick={() => navigate('/purchase-orders')} className="hover:bg-violet-900/30 hover:shadow-inner transition-all duration-300 cursor-pointer group">
                     <td className="py-3 px-6 font-mono text-cyan-400 group-hover:text-cyan-300 transition-colors border-l-2 border-l-transparent group-hover:border-l-cyan-400">{po.po_number}</td>
                     <td className="py-3 px-6 group-hover:text-slate-100 transition-colors">{po.vendor_name || (po.vendor ? po.vendor.name : 'Unknown')}</td>
                     <td className="py-3 px-6 font-mono group-hover:text-slate-100 transition-colors">{formatCurrency(po.total_amount)}</td>
@@ -362,7 +374,7 @@ const Dashboard = () => {
               {recentInvoices.length === 0 ? (
                 <tr><td colSpan={4} className="py-6 text-center text-xs text-slate-500 font-mono">No invoices generated yet</td></tr>
               ) : recentInvoices.map((inv) => (
-                <tr key={inv.id} onClick={() => navigate('/invoices')} className="hover:bg-violet-900/20 transition-all cursor-pointer group">
+                <tr key={inv.id} onClick={() => navigate('/invoices')} className="hover:bg-violet-900/30 hover:shadow-inner transition-all duration-300 cursor-pointer group">
                   <td className="py-3 px-6 font-mono text-cyan-400 group-hover:text-cyan-300 border-l-2 border-l-transparent group-hover:border-l-cyan-400">{inv.invoice_number}</td>
                   <td className="py-3 px-6 group-hover:text-slate-100">{inv.vendor_name || `Vendor #${inv.vendor_id}`}</td>
                   <td className="py-3 px-6 font-mono">{formatCurrency(inv.total)}</td>
@@ -379,26 +391,26 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-violet-500/10 pt-6">
           <button 
             onClick={() => navigate('/rfqs')}
-            className="flex items-center justify-center space-x-2 px-4 py-3 bg-slate-900 border border-violet-500/10 hover:border-cyan-400/40 rounded-xl text-xs font-mono text-cyan-400 hover:bg-slate-800/40 transition duration-200"
+            className="flex items-center justify-center space-x-2 px-4 py-3 bg-slate-900 border border-violet-500/10 hover:border-cyan-400/40 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] rounded-xl text-xs font-mono text-cyan-400 hover:bg-slate-800/40 transition duration-300 group"
           >
-            <Plus className="w-4 h-4" />
-            <span>+ new RFQ</span>
+            <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
+            <span className="group-hover:text-slate-200 transition-colors">+ new RFQ</span>
           </button>
           
           <button 
             onClick={() => navigate('/vendors')}
-            className="flex items-center justify-center space-x-2 px-4 py-3 bg-slate-900 border border-violet-500/10 hover:border-cyan-400/40 rounded-xl text-xs font-mono text-cyan-400 hover:bg-slate-800/40 transition duration-200"
+            className="flex items-center justify-center space-x-2 px-4 py-3 bg-slate-900 border border-violet-500/10 hover:border-cyan-400/40 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] rounded-xl text-xs font-mono text-cyan-400 hover:bg-slate-800/40 transition duration-300 group"
           >
-            <Users className="w-4 h-4" />
-            <span>Add Vendor</span>
+            <Users className="w-4 h-4 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform duration-300" />
+            <span className="group-hover:text-slate-200 transition-colors">Add Vendor</span>
           </button>
           
           <button 
             onClick={() => navigate('/invoices')}
-            className="flex items-center justify-center space-x-2 px-4 py-3 bg-slate-900 border border-violet-500/10 hover:border-cyan-400/40 rounded-xl text-xs font-mono text-cyan-400 hover:bg-slate-800/40 transition duration-200"
+            className="flex items-center justify-center space-x-2 px-4 py-3 bg-slate-900 border border-violet-500/10 hover:border-cyan-400/40 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] rounded-xl text-xs font-mono text-cyan-400 hover:bg-slate-800/40 transition duration-300 group"
           >
-            <FileSpreadsheet className="w-4 h-4" />
-            <span>View Invoices</span>
+            <FileSpreadsheet className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
+            <span className="group-hover:text-slate-200 transition-colors">View Invoices</span>
           </button>
         </div>
       )}

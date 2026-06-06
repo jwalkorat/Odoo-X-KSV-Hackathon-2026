@@ -266,10 +266,14 @@ const Invoices = () => {
 
           {/* Invoice Table */}
           <div className="glass-panel overflow-hidden rounded-xl border border-violet-500/15">
-            <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr_100px] gap-4 border-b border-violet-500/10 px-4 py-3 font-mono text-xs uppercase tracking-widest text-slate-500 max-lg:hidden">
-              <span>Invoice No</span><span>Vendor</span><span>Total (incl. GST)</span><span>Created</span><span>Status</span>
-            </div>
             <div className="max-h-[400px] overflow-y-auto">
+              <div className="sticky top-0 z-10 grid grid-cols-1 lg:grid-cols-12 gap-4 border-b border-violet-500/10 bg-slate-900/95 backdrop-blur-md px-4 py-3 font-mono text-xs uppercase tracking-widest text-slate-500 max-lg:hidden">
+                <span className="lg:col-span-4">Invoice No</span>
+                <span className="lg:col-span-3">Vendor</span>
+                <span className="lg:col-span-2">Total (incl. GST)</span>
+                <span className="lg:col-span-2">Created</span>
+                <span className="lg:col-span-1">Status</span>
+              </div>
               {loading ? (
                 <div className="p-8 text-center text-sm text-slate-400">Syncing billing console...</div>
               ) : invoices.length === 0 ? (
@@ -284,14 +288,16 @@ const Invoices = () => {
                   tabIndex={0}
                   onClick={() => setSelectedId(inv.id)}
                   onKeyDown={(e) => e.key === 'Enter' && setSelectedId(inv.id)}
-                  className={`grid grid-cols-1 gap-3 border-b border-violet-500/10 px-4 py-4 text-left transition hover:bg-slate-800/30 lg:grid-cols-[1.5fr_1fr_1fr_1fr_100px] lg:items-center cursor-pointer ${selectedId === inv.id ? 'bg-cyan-500/5' : ''}`}
+                  className={`grid grid-cols-1 gap-4 border-b border-violet-500/10 px-4 py-4 text-left transition hover:bg-slate-800/30 lg:grid-cols-12 lg:items-center cursor-pointer ${selectedId === inv.id ? 'bg-cyan-500/5' : ''}`}
                 >
-                  <p className="font-mono text-sm font-semibold text-slate-100">{inv.invoice_number}</p>
-                  <p className="text-sm text-slate-300 truncate">{inv.vendor_name || `Vendor #${inv.vendor_id}`}</p>
-                  <p className="font-mono text-sm text-cyan-400">{formatCurrency(inv.total)}</p>
-                  <p className="text-xs text-slate-400">{formatDate(inv.created_at)}</p>
-                  <span className={`w-fit rounded-full px-2.5 py-0.5 font-mono text-xs uppercase ${getStatusBadgeClass(inv.status)}`}>
-                    {inv.status}
+                  <p className="font-mono text-sm font-semibold text-slate-100 lg:col-span-4">{inv.invoice_number}</p>
+                  <p className="text-sm text-slate-300 truncate lg:col-span-3">{inv.vendor_name || `Vendor #${inv.vendor_id}`}</p>
+                  <p className="font-mono text-sm text-cyan-400 lg:col-span-2">{formatCurrency(inv.total)}</p>
+                  <p className="text-xs text-slate-400 lg:col-span-2">{formatDate(inv.created_at)}</p>
+                  <span className="lg:col-span-1">
+                    <span className={`w-fit rounded-full px-2.5 py-0.5 font-mono text-xs uppercase ${getStatusBadgeClass(inv.status)}`}>
+                      {inv.status}
+                    </span>
                   </span>
                 </div>
               ))}
