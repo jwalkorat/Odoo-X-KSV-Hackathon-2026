@@ -253,8 +253,8 @@ const Login = () => {
 
         <div className="w-full max-w-md bg-slate-900/40 border border-violet-500/15 backdrop-blur-2xl rounded-2xl p-8 shadow-2xl">
           <div className="text-center mb-8">
-            <div className="inline-flex bg-gradient-to-tr from-violet-600 to-cyan-400 p-3 rounded-2xl shadow-glow-cyan mb-4">
-              <Rocket className="w-7 h-7 text-white" />
+            <div className="inline-flex mb-4">
+              <img src="/logo.png" className="w-14 h-14 object-contain rounded-2xl shadow-glow-cyan" alt="Logo" />
             </div>
             <h2 className="font-outfit font-extrabold text-2xl tracking-wide bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
               PROCUREMENT GALAXY

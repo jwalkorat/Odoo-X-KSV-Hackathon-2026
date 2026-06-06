@@ -68,8 +68,8 @@ const Register = () => {
 
         {/* Branding Title */}
         <div className="text-center mb-6">
-          <div className="inline-flex bg-gradient-to-tr from-violet-600 to-cyan-400 p-2.5 rounded-2xl shadow-glow-cyan mb-3">
-            <Rocket className="w-6 h-6 text-white" />
+          <div className="inline-flex mb-3">
+            <img src="/logo.png" className="w-12 h-12 object-contain rounded-2xl shadow-glow-cyan" alt="Logo" />
           </div>
           <h2 className="font-outfit font-extrabold text-2xl tracking-wide bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
             REGISTER NEW PILOT

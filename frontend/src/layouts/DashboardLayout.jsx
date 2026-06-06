@@ -194,8 +194,8 @@ const DashboardLayout = ({ children }) => {
         <div>
           {/* Logo Brand Header */}
           <div className="p-6 border-b border-violet-500/10 flex items-center space-x-3">
-            <div className="bg-gradient-to-tr from-violet-600 to-cyan-400 p-2 rounded-lg shadow-glow-cyan">
-              <Rocket className="w-5 h-5 text-white animate-pulse" />
+            <div className="shrink-0">
+              <img src="/logo.png" className="w-9 h-9 object-contain rounded-lg shadow-glow-cyan animate-pulse" alt="Logo" />
             </div>
             <div>
               <span className="font-outfit font-bold text-lg bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">GALAXY ERP</span>
