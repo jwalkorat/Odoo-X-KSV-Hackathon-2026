@@ -38,8 +38,35 @@ const Dashboard = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Recharts Spend trend data matching mockup
-  const chartData = [
+  const [chartData, setChartData] = useState([]);
+
+  const getDynamicChartData = (purchaseOrders) => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const result = [];
+    const today = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      result.push({
+        name: months[d.getMonth()],
+        year: d.getFullYear(),
+        monthIndex: d.getMonth(),
+        spend: 0
+      });
+    }
+    
+    purchaseOrders.forEach(po => {
+      if (!po.issued_at || po.status === 'CANCELLED') return;
+      const poDate = new Date(po.issued_at);
+      const match = result.find(r => r.monthIndex === poDate.getMonth() && r.year === poDate.getFullYear());
+      if (match) {
+        match.spend += po.total_amount || 0;
+      }
+    });
+    
+    return result.map(r => ({ name: r.name, spend: r.spend }));
+  };
+
+  const getMockChartData = () => [
     { name: 'Jan', spend: 240000 },
     { name: 'Feb', spend: 450000 },
     { name: 'Mar', spend: 300000 },
@@ -75,6 +102,7 @@ const Dashboard = () => {
 
         setRecentPos(ordersRes.data.slice(0, 4));
         setRecentInvoices(invoicesRes.data.slice(0, 4));
+        setChartData(getDynamicChartData(ordersRes.data));
 
         setLogs(logsRes.data.slice(0, 5));
       } catch (err) {
@@ -90,6 +118,7 @@ const Dashboard = () => {
         
         setRecentPos(getMockRecentPOs());
         setRecentInvoices(getMockRecentInvoices());
+        setChartData(getMockChartData());
         setLogs(MOCK_LOGS.slice(0, 5));
       } finally {
         setLoading(false);
