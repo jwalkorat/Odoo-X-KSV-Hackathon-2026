@@ -34,6 +34,7 @@ const Dashboard = () => {
     overdueInvoices: 3
   });
   const [recentPos, setRecentPos] = useState([]);
+  const [recentInvoices, setRecentInvoices] = useState([]);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -74,9 +75,16 @@ const Dashboard = () => {
 
         // Use backend POs if they exist
         if (ordersRes.data.length > 0) {
-          setRecentPos(ordersRes.data.slice(0, 5));
+          setRecentPos(ordersRes.data.slice(0, 4));
         } else {
           setRecentPos(getMockRecentPOs());
+        }
+
+        // Recent Invoices
+        if (invoicesRes.data.length > 0) {
+          setRecentInvoices(invoicesRes.data.slice(0, 4));
+        } else {
+          setRecentInvoices(getMockRecentInvoices());
         }
 
         setLogs(logsRes.data.slice(0, 5));
@@ -92,6 +100,7 @@ const Dashboard = () => {
         });
         
         setRecentPos(getMockRecentPOs());
+        setRecentInvoices(getMockRecentInvoices());
         setLogs(MOCK_LOGS.slice(0, 5));
       } finally {
         setLoading(false);
@@ -109,6 +118,12 @@ const Dashboard = () => {
       { id: 3, po_number: "Po3", vendor_name: "OfficeNeed Co", total_amount: 34900, status: "draft" }
     ];
   };
+
+  const getMockRecentInvoices = () => [
+    { id: 1, invoice_number: 'INV-2026-0001', vendor_name: 'Nebula IT Solutions', total: 137500, status: 'PAID' },
+    { id: 2, invoice_number: 'INV-2026-0002', vendor_name: 'Galactic Supplies Ltd', total: 59400, status: 'SENT' },
+    { id: 3, invoice_number: 'INV-2026-0003', vendor_name: 'Starlight Logistics', total: 82620, status: 'DRAFT' },
+  ];
 
   const getFullName = () => {
     if (user?.first_name) {
@@ -243,33 +258,28 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Recent Purchase Orders Table */}
-        <div className="lg:col-span-2 glass-panel rounded-xl border border-violet-500/10 overflow-hidden flex flex-col h-full">
+        <div className="lg:col-span-2 glass-panel rounded-xl border border-violet-500/10 overflow-hidden flex flex-col">
           <div className="p-6 border-b border-violet-500/10">
             <h4 className="font-outfit font-semibold text-slate-200 text-base">Recent Purchase Orders</h4>
             <p className="text-xs text-slate-500 font-mono mt-0.5">LATEST REQUISITION CONTRACTS</p>
           </div>
-          
-          <div className="overflow-x-auto flex-1">
+          <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-violet-500/10 bg-slate-900/40 text-slate-400 text-xs font-mono uppercase">
-                  <th className="py-3.5 px-6">PO#</th>
-                  <th className="py-3.5 px-6">Vendor</th>
-                  <th className="py-3.5 px-6">Amount</th>
-                  <th className="py-3.5 px-6">Status</th>
+                  <th className="py-3 px-6">PO#</th>
+                  <th className="py-3 px-6">Vendor</th>
+                  <th className="py-3 px-6">Amount</th>
+                  <th className="py-3 px-6">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-violet-500/5 text-sm text-slate-300">
                 {recentPos.map((po, index) => (
-                  <tr key={index} className="hover:bg-violet-900/20 transition-all duration-150 cursor-pointer group">
-                    <td className="py-3.5 px-6 font-mono text-cyan-400 group-hover:text-cyan-300 transition-colors duration-150 border-l-2 border-l-transparent group-hover:border-l-cyan-400">{po.po_number}</td>
-                    <td className="py-3.5 px-6 group-hover:text-slate-100 transition-colors duration-150">{po.vendor_name || (po.vendor ? po.vendor.name : 'Unknown')}</td>
-                    <td className="py-3.5 px-6 font-mono group-hover:text-slate-100 transition-colors duration-150">{formatCurrency(po.total_amount)}</td>
-                    <td className="py-3.5 px-6">
-                      <span className={`px-2 py-0.5 rounded text-xs font-mono font-medium uppercase ${getStatusBadgeClass(po.status)}`}>
-                        {po.status}
-                      </span>
-                    </td>
+                  <tr key={index} onClick={() => navigate('/purchase-orders')} className="hover:bg-violet-900/20 transition-all duration-150 cursor-pointer group">
+                    <td className="py-3 px-6 font-mono text-cyan-400 group-hover:text-cyan-300 transition-colors border-l-2 border-l-transparent group-hover:border-l-cyan-400">{po.po_number}</td>
+                    <td className="py-3 px-6 group-hover:text-slate-100 transition-colors">{po.vendor_name || (po.vendor ? po.vendor.name : 'Unknown')}</td>
+                    <td className="py-3 px-6 font-mono group-hover:text-slate-100 transition-colors">{formatCurrency(po.total_amount)}</td>
+                    <td className="py-3 px-6"><span className={`px-2 py-0.5 rounded text-xs font-mono font-medium uppercase ${getStatusBadgeClass(po.status)}`}>{po.status}</span></td>
                   </tr>
                 ))}
               </tbody>
@@ -278,10 +288,10 @@ const Dashboard = () => {
         </div>
 
         {/* Spend Trend Panel */}
-        <div className="glass-panel rounded-xl p-6 border border-violet-500/10 flex flex-col h-full justify-between">
+        <div className="glass-panel rounded-xl p-6 border border-violet-500/10 flex flex-col justify-between">
           <div>
             <h4 className="font-outfit font-semibold text-slate-200 text-base mb-6">Spending Trends (6 Months)</h4>
-            <div className="h-64 w-full">
+            <div className="h-52 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData}>
                   <defs>
@@ -294,12 +304,7 @@ const Dashboard = () => {
                   <XAxis dataKey="name" stroke="#64748b" fontSize={10} tickLine={false} />
                   <YAxis stroke="#64748b" fontSize={10} tickLine={false} />
                   <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#090a16', 
-                      borderColor: 'rgba(6, 182, 212, 0.3)', 
-                      borderRadius: '8px',
-                      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.5)'
-                    }}
+                    contentStyle={{ backgroundColor: '#090a16', borderColor: 'rgba(6,182,212,0.3)', borderRadius: '8px' }}
                     itemStyle={{ color: '#22d3ee', fontFamily: 'monospace', fontSize: '12px' }}
                     labelStyle={{ color: '#f8fafc', fontWeight: 'bold', fontFamily: 'Outfit, sans-serif' }}
                     formatter={(value) => [formatCurrency(value), 'Spend']}
@@ -309,6 +314,43 @@ const Dashboard = () => {
               </ResponsiveContainer>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Recent Invoices Table */}
+      <div className="glass-panel rounded-xl border border-violet-500/10 overflow-hidden">
+        <div className="p-5 border-b border-violet-500/10 flex items-center justify-between">
+          <div>
+            <h4 className="font-outfit font-semibold text-slate-200 text-base">Recent Invoices</h4>
+            <p className="text-xs text-slate-500 font-mono mt-0.5">BILLING & PAYMENT STATUS</p>
+          </div>
+          <button onClick={() => navigate('/invoices')} className="text-[11px] text-violet-400 hover:text-cyan-400 font-mono transition-colors">
+            View All →
+          </button>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-violet-500/10 bg-slate-900/40 text-slate-400 text-xs font-mono uppercase">
+                <th className="py-3 px-6">Invoice #</th>
+                <th className="py-3 px-6">Vendor</th>
+                <th className="py-3 px-6">Total (incl. GST)</th>
+                <th className="py-3 px-6">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-violet-500/5 text-sm text-slate-300">
+              {recentInvoices.length === 0 ? (
+                <tr><td colSpan={4} className="py-6 text-center text-xs text-slate-500 font-mono">No invoices generated yet</td></tr>
+              ) : recentInvoices.map((inv) => (
+                <tr key={inv.id} onClick={() => navigate('/invoices')} className="hover:bg-violet-900/20 transition-all cursor-pointer group">
+                  <td className="py-3 px-6 font-mono text-cyan-400 group-hover:text-cyan-300 border-l-2 border-l-transparent group-hover:border-l-cyan-400">{inv.invoice_number}</td>
+                  <td className="py-3 px-6 group-hover:text-slate-100">{inv.vendor_name || `Vendor #${inv.vendor_id}`}</td>
+                  <td className="py-3 px-6 font-mono">{formatCurrency(inv.total)}</td>
+                  <td className="py-3 px-6"><span className={`px-2 py-0.5 rounded text-xs font-mono font-medium uppercase ${getStatusBadgeClass(inv.status)}`}>{inv.status}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 

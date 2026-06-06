@@ -7,17 +7,21 @@ import {
   CalendarClock,
   ChevronDown,
   ChevronUp,
+  Crown,
+  Edit2,
   FilePlus2,
   Files,
   PackagePlus,
   Paperclip,
   Plus,
   Rocket,
+  Save,
   Search,
   Send,
   ThumbsUp,
   Trash2,
   Users,
+  X,
 } from 'lucide-react';
 import { MOCK_RFQS, MOCK_QUOTATIONS, MOCK_VENDORS } from '../mockData/mockDb';
 
@@ -57,6 +61,11 @@ const RFQs = () => {
   // Vendor quotation form (for VENDOR role)
   const [vendorQuoteForm, setVendorQuoteForm] = useState({});
   const [submittingQuote, setSubmittingQuote] = useState(false);
+
+  // Edit quotation state (vendor edits their own submitted quote)
+  const [editingQuoteId, setEditingQuoteId] = useState(null);
+  const [editQuoteForm, setEditQuoteForm] = useState({});
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const activeVendors = useMemo(
     () => vendors.filter((vendor) => vendor.status === 'ACTIVE'),
@@ -240,6 +249,33 @@ const RFQs = () => {
       setMessage(e.response?.data?.detail || 'Failed to submit quotation.');
     } finally {
       setSubmittingQuote(false);
+    }
+  };
+
+  const handleVendorQuoteEdit = async (rfqId, quoteId) => {
+    if (!editQuoteForm.total_amount || !editQuoteForm.delivery_days) {
+      setMessage('Total amount and delivery days are required.');
+      return;
+    }
+    setSavingEdit(true);
+    setMessage('');
+    try {
+      const { data } = await api.patch(`/api/rfqs/${rfqId}/quotes/${quoteId}`, {
+        total_amount: parseFloat(editQuoteForm.total_amount),
+        delivery_days: parseInt(editQuoteForm.delivery_days),
+        notes: editQuoteForm.notes || null,
+      });
+      setQuotationsByRfq((cur) => ({
+        ...cur,
+        [rfqId]: (cur[rfqId] || []).map((q) => (q.id === quoteId ? data : q))
+      }));
+      setEditingQuoteId(null);
+      setEditQuoteForm({});
+      setMessage('Quotation updated successfully.');
+    } catch (e) {
+      setMessage(e.response?.data?.detail || 'Failed to update quotation.');
+    } finally {
+      setSavingEdit(false);
     }
   };
 
@@ -482,41 +518,137 @@ const RFQs = () => {
                       <p className="text-xs text-slate-500">Loading quotations...</p>
                     ) : quotationsByRfq[rfq.id].length === 0 ? (
                       <p className="text-xs text-slate-500">No quotations received yet.</p>
-                    ) : (
-                      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                        {quotationsByRfq[rfq.id].map((quote) => (
-                          <div key={quote.id} className="rounded-lg border border-violet-500/20 bg-slate-950/40 p-4 space-y-3">
-                            <div className="flex items-start justify-between gap-2">
-                              <div>
-                                <p className="font-semibold text-slate-200 text-sm">{vendorName(quote.vendor_id)}</p>
-                                <p className="text-xs text-slate-500 mt-0.5">Delivery in {quote.delivery_days} days</p>
-                              </div>
-                              <span className={`shrink-0 rounded-full px-2.5 py-0.5 font-mono text-xs uppercase ${getStatusBadgeClass(quote.status)}`}>
-                                {quote.status}
-                              </span>
-                            </div>
-                            <div className="rounded-lg bg-cyan-500/10 border border-cyan-500/20 px-3 py-2">
-                              <span className="font-mono text-xs uppercase text-cyan-400">Total Amount</span>
-                              <p className="font-mono text-lg font-bold text-slate-100">{formatCurrency(quote.total_amount)}</p>
-                            </div>
-                            {quote.notes && (
-                              <p className="text-xs text-slate-400 italic border-t border-slate-800 pt-2">"{quote.notes}"</p>
-                            )}
-                            {/* Request Approval — Officers/Admins for OPEN RFQs */}
-                            {isOfficerOrAdmin && rfq.status === 'OPEN' && quote.status === 'SUBMITTED' && (
-                              <button
-                                disabled={requestingApproval === quote.id}
-                                onClick={() => handleRequestApproval(rfq.id, quote.id)}
-                                className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 py-2 text-xs font-semibold text-emerald-400 hover:bg-emerald-500/20 transition disabled:opacity-50"
+                    ) : (() => {
+                      const quotes = quotationsByRfq[rfq.id];
+                      const lowestPrice = Math.min(...quotes.map((q) => q.total_amount));
+                      return (
+                        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                          {quotes.map((quote) => {
+                            const isLowest = quote.total_amount === lowestPrice && quotes.length > 1;
+                            const isEditing = editingQuoteId === quote.id;
+                            return (
+                              <div
+                                key={quote.id}
+                                className={`rounded-lg border p-4 space-y-3 transition-all ${
+                                  isLowest
+                                    ? 'border-emerald-400/40 bg-emerald-950/20 ring-1 ring-emerald-400/20'
+                                    : 'border-violet-500/20 bg-slate-950/40'
+                                }`}
                               >
-                                <ThumbsUp className="h-3.5 w-3.5" />
-                                {requestingApproval === quote.id ? 'Requesting...' : 'Request Manager Approval'}
-                              </button>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                                {/* Header */}
+                                <div className="flex items-start justify-between gap-2">
+                                  <div>
+                                    <div className="flex items-center gap-2">
+                                      <p className="font-semibold text-slate-200 text-sm">{vendorName(quote.vendor_id)}</p>
+                                      {isLowest && (
+                                        <span className="flex items-center gap-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 px-2 py-0.5 text-[9px] font-bold text-emerald-400 uppercase tracking-widest">
+                                          <Crown className="h-2.5 w-2.5" /> LOWEST
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-xs text-slate-500 mt-0.5">Delivery in {quote.delivery_days} days</p>
+                                  </div>
+                                  <span className={`shrink-0 rounded-full px-2.5 py-0.5 font-mono text-xs uppercase ${getStatusBadgeClass(quote.status)}`}>
+                                    {quote.status}
+                                  </span>
+                                </div>
+
+                                {/* Edit Mode */}
+                                {isEditing ? (
+                                  <div className="space-y-2 border border-cyan-500/20 bg-cyan-500/5 rounded-lg p-3">
+                                    <p className="font-mono text-[10px] uppercase tracking-widest text-cyan-400">Edit Quotation</p>
+                                    <div className="grid grid-cols-2 gap-2">
+                                      <label className="block text-xs text-slate-300">
+                                        Amount (INR)
+                                        <input
+                                          type="number"
+                                          min="1"
+                                          className="mt-1 w-full rounded border border-slate-700 bg-slate-950/70 px-2 py-1.5 text-sm text-slate-100 outline-none focus:border-cyan-400"
+                                          value={editQuoteForm.total_amount || ''}
+                                          onChange={(e) => setEditQuoteForm((f) => ({ ...f, total_amount: e.target.value }))}
+                                        />
+                                      </label>
+                                      <label className="block text-xs text-slate-300">
+                                        Delivery Days
+                                        <input
+                                          type="number"
+                                          min="1"
+                                          className="mt-1 w-full rounded border border-slate-700 bg-slate-950/70 px-2 py-1.5 text-sm text-slate-100 outline-none focus:border-cyan-400"
+                                          value={editQuoteForm.delivery_days || ''}
+                                          onChange={(e) => setEditQuoteForm((f) => ({ ...f, delivery_days: e.target.value }))}
+                                        />
+                                      </label>
+                                    </div>
+                                    <textarea
+                                      rows="2"
+                                      placeholder="Notes (optional)"
+                                      className="w-full resize-none rounded border border-slate-700 bg-slate-950/70 px-2 py-1.5 text-xs text-slate-100 outline-none focus:border-cyan-400"
+                                      value={editQuoteForm.notes || ''}
+                                      onChange={(e) => setEditQuoteForm((f) => ({ ...f, notes: e.target.value }))}
+                                    />
+                                    <div className="flex gap-2">
+                                      <button
+                                        disabled={savingEdit}
+                                        onClick={() => handleVendorQuoteEdit(rfq.id, quote.id)}
+                                        className="flex-1 flex items-center justify-center gap-1.5 rounded border border-emerald-500/30 bg-emerald-500/10 py-1.5 text-xs text-emerald-400 hover:bg-emerald-500/20 transition disabled:opacity-50"
+                                      >
+                                        <Save className="h-3 w-3" />{savingEdit ? 'Saving...' : 'Save'}
+                                      </button>
+                                      <button
+                                        onClick={() => { setEditingQuoteId(null); setEditQuoteForm({}); }}
+                                        className="px-3 flex items-center justify-center rounded border border-slate-700 text-slate-400 hover:text-red-400 transition py-1.5"
+                                      >
+                                        <X className="h-3 w-3" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <>
+                                    {/* Price display */}
+                                    <div className={`rounded-lg border px-3 py-2 ${
+                                      isLowest ? 'bg-emerald-500/10 border-emerald-400/20' : 'bg-cyan-500/10 border-cyan-500/20'
+                                    }`}>
+                                      <span className={`font-mono text-xs uppercase ${isLowest ? 'text-emerald-400' : 'text-cyan-400'}`}>Total Amount</span>
+                                      <p className={`font-mono text-lg font-bold ${isLowest ? 'text-emerald-300' : 'text-slate-100'}`}>{formatCurrency(quote.total_amount)}</p>
+                                    </div>
+                                    {quote.notes && (
+                                      <p className="text-xs text-slate-400 italic border-t border-slate-800 pt-2">"{quote.notes}"</p>
+                                    )}
+                                    {/* Vendor Edit Button */}
+                                    {isVendor && quote.status === 'SUBMITTED' && (
+                                      <button
+                                        onClick={() => {
+                                          setEditingQuoteId(quote.id);
+                                          setEditQuoteForm({
+                                            total_amount: quote.total_amount,
+                                            delivery_days: quote.delivery_days,
+                                            notes: quote.notes || ''
+                                          });
+                                        }}
+                                        className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-slate-700 py-1.5 text-xs text-slate-400 hover:text-cyan-400 hover:border-cyan-500/30 transition"
+                                      >
+                                        <Edit2 className="h-3 w-3" /> Edit Quotation
+                                      </button>
+                                    )}
+                                    {/* Request Approval — Officers/Admins */}
+                                    {isOfficerOrAdmin && rfq.status === 'OPEN' && quote.status === 'SUBMITTED' && (
+                                      <button
+                                        disabled={requestingApproval === quote.id}
+                                        onClick={() => handleRequestApproval(rfq.id, quote.id)}
+                                        className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 py-2 text-xs font-semibold text-emerald-400 hover:bg-emerald-500/20 transition disabled:opacity-50"
+                                      >
+                                        <ThumbsUp className="h-3.5 w-3.5" />
+                                        {requestingApproval === quote.id ? 'Requesting...' : 'Request Manager Approval'}
+                                      </button>
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })()}
 
                     {/* Vendor Quotation Submit Form */}
                     {isVendor && rfq.status === 'OPEN' && (

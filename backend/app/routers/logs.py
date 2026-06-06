@@ -23,7 +23,10 @@ def get_logs(
             et = et[:-1]
         query = query.filter(ActivityLog.entity_type == et)
         
-    return query.order_by(ActivityLog.created_at.desc()).limit(limit).all()
+    logs = query.order_by(ActivityLog.created_at.desc()).limit(limit).all()
+    for log in logs:
+        log.username = log.user.username if log.user else "system"
+    return logs
 
 def log_activity(db: Session, user_id: int, action: str, entity_type: str, entity_id: Optional[int] = None, metadata_str: Optional[str] = None):
     log_entry = ActivityLog(

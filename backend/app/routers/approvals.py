@@ -12,19 +12,46 @@ router = APIRouter(prefix="/api/approvals", tags=["Approvals"])
 manager_only = RoleChecker(["MANAGER", "ADMIN"])
 officer_or_admin = RoleChecker(["OFFICER", "ADMIN"])
 
+
+def populate_approval_details(approval: Approval) -> Approval:
+    rfq = approval.rfq
+    quote = approval.quotation
+    requester = approval.requester
+    resolver = approval.resolver
+
+    approval.rfq_title = rfq.title if rfq else None
+    if quote:
+        approval.vendor_name = quote.vendor.name if quote.vendor else None
+        approval.total_amount = quote.total_amount
+        approval.delivery_days = quote.delivery_days
+        approval.notes = quote.notes
+    else:
+        approval.vendor_name = None
+        approval.total_amount = 0.0
+        approval.delivery_days = 0
+        approval.notes = None
+
+    approval.requested_by_username = requester.username if requester else None
+    approval.approved_by_username = resolver.username if resolver else None
+    return approval
+
+
 @router.get("/", response_model=List[ApprovalResponse])
 def get_approvals(status: Optional[str] = None, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     query = db.query(Approval)
     if status:
         query = query.filter(Approval.status == status)
-    return query.all()
+    approvals = query.all()
+    return [populate_approval_details(app) for app in approvals]
+
 
 @router.get("/{approval_id}", response_model=ApprovalResponse)
 def get_approval(approval_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     approval = db.query(Approval).filter(Approval.id == approval_id).first()
     if not approval:
         raise HTTPException(status_code=404, detail="Approval request not found")
-    return approval
+    return populate_approval_details(approval)
+
 
 @router.post("/", response_model=ApprovalResponse, status_code=status.HTTP_201_CREATED)
 def request_approval(
@@ -46,7 +73,8 @@ def request_approval(
     db.add(db_approval)
     db.commit()
     db.refresh(db_approval)
-    return db_approval
+    return populate_approval_details(db_approval)
+
 
 @router.post("/{approval_id}/resolve", response_model=ApprovalResponse)
 def resolve_approval(
@@ -92,4 +120,4 @@ def resolve_approval(
 
     db.commit()
     db.refresh(approval)
-    return approval
+    return populate_approval_details(approval)

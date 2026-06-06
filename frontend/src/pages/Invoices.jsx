@@ -104,6 +104,20 @@ const Invoices = () => {
     }
   };
 
+  const handleEmail = async (inv) => {
+    setUpdatingId(inv.id);
+    setMessage('');
+    try {
+      const { data } = await api.post(`/api/orders/invoices/${inv.id}/email`);
+      setInvoices((cur) => cur.map((i) => (i.id === inv.id ? { ...i, status: 'SENT', sent_at: data.sent_at } : i)));
+      setMessage(`✅ ${data.message}`);
+    } catch (err) {
+      setMessage(err.response?.data?.detail || 'Email transmission failed.');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   const handlePrint = () => {
     if (!selected) return;
     const win = window.open('', '_blank', 'width=800,height=1050');
@@ -340,10 +354,11 @@ const Invoices = () => {
                 {selected.status === 'DRAFT' && (
                   <button
                     disabled={updatingId === selected.id}
-                    onClick={() => handleStatusUpdate(selected, 'SENT')}
+                    onClick={() => handleEmail(selected)}
                     className="flex w-full items-center justify-center gap-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 py-2.5 text-xs font-semibold text-cyan-400 hover:bg-cyan-500/20 transition disabled:opacity-50"
                   >
-                    <Send className="h-3.5 w-3.5" /> Mark as Sent
+                    <Send className="h-3.5 w-3.5" />
+                    {updatingId === selected.id ? 'Sending...' : 'Send Invoice via Email'}
                   </button>
                 )}
                 {selected.status === 'SENT' && (

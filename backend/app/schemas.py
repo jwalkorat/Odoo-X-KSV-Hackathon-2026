@@ -193,6 +193,7 @@ class QuotationResponse(QuotationBase):
     id: int
     submitted_at: datetime
     items: List[QuotationItemResponse] = []
+    vendor_name: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -218,6 +219,13 @@ class ApprovalResponse(ApprovalBase):
     remarks: Optional[str] = None
     created_at: datetime
     resolved_at: Optional[datetime] = None
+    rfq_title: Optional[str] = None
+    vendor_name: Optional[str] = None
+    total_amount: Optional[float] = None
+    delivery_days: Optional[int] = None
+    notes: Optional[str] = None
+    requested_by_username: Optional[str] = None
+    approved_by_username: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -235,6 +243,8 @@ class PurchaseOrderBase(BaseModel):
 class PurchaseOrderResponse(PurchaseOrderBase):
     id: int
     issued_at: datetime
+    vendor_name: Optional[str] = None
+    rfq_title: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -260,6 +270,8 @@ class InvoiceResponse(InvoiceBase):
     id: int
     created_at: datetime
     sent_at: Optional[datetime] = None
+    vendor_name: Optional[str] = None
+    po_number: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -277,6 +289,29 @@ class ActivityLogResponse(ActivityLogBase):
     id: int
     user_id: int
     created_at: datetime
+    username: Optional[str] = None
 
     class Config:
         from_attributes = True
+
+
+# ==================== NEW FEATURE SCHEMAS ====================
+class ForgotPasswordRequest(BaseModel):
+    username: str
+
+class ForgotPasswordReset(BaseModel):
+    username: str
+    otp: str
+    new_password: str
+
+class QuotationUpdate(BaseModel):
+    total_amount: float
+    delivery_days: int
+    notes: Optional[str] = None
+
+class PurchaseOrderStatusUpdate(BaseModel):
+    status: str
+
+class InvoiceStatusUpdate(BaseModel):
+    status: str
+
