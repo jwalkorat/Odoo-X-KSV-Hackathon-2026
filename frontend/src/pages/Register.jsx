@@ -37,13 +37,16 @@ const Register = () => {
         navigate('/login');
       }, 2500);
     } catch (err) {
-      console.warn("Backend unavailable, simulating frontend mock registration...");
-      
-      // MOCK FALLBACK SUCCESS FOR OFFLINE DEVELOPMENT
-      setSuccess('[Simulation Mode] Uplink credentials cached successfully! Redirecting...');
-      setTimeout(() => {
-        navigate('/login');
-      }, 2500);
+      if (err.response) {
+        setError(err.response.data?.detail || 'Registration failed. Check validation rules.');
+      } else {
+        console.warn("Backend unavailable, simulating frontend mock registration...");
+        // MOCK FALLBACK SUCCESS FOR OFFLINE DEVELOPMENT
+        setSuccess('[Simulation Mode] Uplink credentials cached successfully! Redirecting...');
+        setTimeout(() => {
+          navigate('/login');
+        }, 2500);
+      }
     } finally {
       setLoading(false);
     }
