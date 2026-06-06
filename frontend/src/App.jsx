@@ -7,7 +7,13 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Reports from './pages/Reports';
 import Logs from './pages/Logs';
+import Vendors from './pages/Vendors';
+import RFQs from './pages/RFQs';
+import Approvals from './pages/Approvals';
+import PurchaseOrders from './pages/PurchaseOrders';
+import Invoices from './pages/Invoices';
 import { Terminal, ShieldAlert } from 'lucide-react';
+
 
 // Protected Route Guard (Checks if user is logged in)
 const ProtectedRoute = ({ children }) => {
@@ -100,11 +106,7 @@ const App = () => {
               <ProtectedRoute>
                 <RoleGuard allowedRoles={['ADMIN', 'OFFICER', 'MANAGER']}>
                   <DashboardLayout>
-                    <WIPPage 
-                      title="Vendor Management" 
-                      assignee="Person 2 (Deepam / Meet / Kashvi)" 
-                      details="Create vendor profiles, search, filter by category, validate GST formats (15-char regex), toggle statuses, and display past order history."
-                    />
+                    <Vendors />
                   </DashboardLayout>
                 </RoleGuard>
               </ProtectedRoute>
@@ -115,11 +117,7 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <DashboardLayout>
-                  <WIPPage 
-                    title="RFQ & Quotation Deck" 
-                    assignee="Person 3 (Deepam / Meet / Kashvi)" 
-                    details="Create multi-step RFQs, add dynamic line items, invite vendors, compare side-by-side total costs, and trigger manager approvals."
-                  />
+                  <RFQs />
                 </DashboardLayout>
               </ProtectedRoute>
             }
@@ -130,11 +128,7 @@ const App = () => {
               <ProtectedRoute>
                 <RoleGuard allowedRoles={['ADMIN', 'MANAGER']}>
                   <DashboardLayout>
-                    <WIPPage 
-                      title="Manager Approvals Workflow" 
-                      assignee="Person 3 (Deepam / Meet / Kashvi)" 
-                      details="View pending RFQ approval packages. Approve or reject with written remarks to automatically spin up Purchase Orders."
-                    />
+                    <Approvals />
                   </DashboardLayout>
                 </RoleGuard>
               </ProtectedRoute>
@@ -145,11 +139,7 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <DashboardLayout>
-                  <WIPPage 
-                    title="Purchase Orders" 
-                    assignee="Person 4 (Deepam / Meet / Kashvi)" 
-                    details="Track issued Purchase Orders, calculate tax overrides (18% default), generate and sign digital agreements."
-                  />
+                  <PurchaseOrders />
                 </DashboardLayout>
               </ProtectedRoute>
             }
@@ -159,11 +149,7 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <DashboardLayout>
-                  <WIPPage 
-                    title="Invoice Billing Console" 
-                    assignee="Person 4 (Deepam / Meet / Kashvi)" 
-                    details="Generate tax invoices from POs, print A4 invoices cleanly, download PDF captures, and email them using Supabase/Edge mailers."
-                  />
+                  <Invoices />
                 </DashboardLayout>
               </ProtectedRoute>
             }

@@ -71,9 +71,3 @@ def create_invoice(
     db.refresh(db_inv)
     return db_inv
 
-# Schema imports for route signature validation compatibility
-from pydantic import BaseModel
-class InvoiceCreate(BaseModel):
-    po_id: int
-    subtotal: float
-    tax_percent: float = 18.0

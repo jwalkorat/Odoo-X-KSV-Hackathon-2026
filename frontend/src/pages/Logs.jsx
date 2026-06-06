@@ -92,20 +92,20 @@ const Logs = () => {
   };
 
   return (
-    <div class="space-y-8">
+    <div className="space-y-8">
       {/* Title */}
-      <div class="border-b border-violet-500/10 pb-4">
-        <h2 class="font-outfit font-extrabold text-2xl text-slate-100 uppercase tracking-wide">Activity & Logs</h2>
-        <p class="text-xs text-slate-500 font-mono mt-0.5">PROCUREMENT AUDIT TRAIL</p>
+      <div className="border-b border-violet-500/10 pb-4">
+        <h2 className="font-outfit font-extrabold text-2xl text-slate-100 uppercase tracking-wide">Activity & Logs</h2>
+        <p className="text-xs text-slate-500 font-mono mt-0.5">PROCUREMENT AUDIT TRAIL</p>
       </div>
 
       {/* Cyber Filter Tabs */}
-      <div class="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2">
         {filters.map((filter) => (
           <button
             key={filter}
             onClick={() => setActiveFilter(filter)}
-            class={`px-4 py-1.5 rounded-lg text-xs font-mono border transition-all duration-150 ${
+            className={`px-4 py-1.5 rounded-lg text-xs font-mono border transition-all duration-150 ${
               activeFilter === filter
                 ? 'bg-cyan-500/10 text-cyan-400 border-cyan-400 shadow-glow-cyan'
                 : 'bg-slate-900/40 text-slate-400 border-violet-500/10 hover:text-slate-200 hover:border-violet-500/25'
@@ -117,30 +117,30 @@ const Logs = () => {
       </div>
 
       {/* Timeline List */}
-      <div class="relative pl-6 border-l border-violet-500/10 space-y-8 py-4">
+      <div className="relative pl-6 border-l border-violet-500/10 space-y-8 py-4">
         {logs.map((log) => {
           const style = getLogStyle(log);
           const IconComponent = style.icon;
           return (
-            <div key={log.id} class="relative group">
+            <div key={log.id} className="relative group">
               {/* Outer timeline indicator */}
-              <div class={`absolute -left-10 top-0.5 w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-300 ${style.iconClass} group-hover:scale-110`}>
-                <IconComponent class="w-4 h-4" />
+              <div className={`absolute -left-10 top-0.5 w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-300 ${style.iconClass} group-hover:scale-110`}>
+                <IconComponent className="w-4 h-4" />
               </div>
 
               {/* Log Details Card */}
-              <div class="glass-panel rounded-xl p-5 border border-violet-500/10 hover:border-cyan-400/30 transition-all duration-300">
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                  <div class="space-y-1">
-                    <p class="text-sm font-sans text-slate-200 leading-relaxed font-medium">
+              <div className="glass-panel rounded-xl p-5 border border-violet-500/10 hover:border-cyan-400/30 transition-all duration-300">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                  <div className="space-y-1">
+                    <p className="text-sm font-sans text-slate-200 leading-relaxed font-medium">
                       {log.action}
                     </p>
-                    <div class="flex items-center space-x-2">
-                      <span class="text-[9px] font-mono bg-violet-600/10 border border-violet-500/20 text-violet-400 px-2 py-0.5 rounded uppercase">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs font-mono bg-violet-600/10 border border-violet-500/20 text-violet-400 px-2 py-0.5 rounded uppercase">
                         {log.entity_type}
                       </span>
                       {log.entity_id && (
-                        <span class="text-[9px] font-mono text-slate-500">
+                        <span className="text-xs font-mono text-slate-500">
                           ID: #{log.entity_id}
                         </span>
                       )}
@@ -148,7 +148,7 @@ const Logs = () => {
                   </div>
                   
                   {/* Timestamp */}
-                  <span class="text-[10px] font-mono text-slate-500 shrink-0">
+                  <span className="text-xs font-mono text-slate-500 shrink-0">
                     {formatDate(log.created_at)}
                   </span>
                 </div>
@@ -158,16 +158,16 @@ const Logs = () => {
         })}
 
         {logs.length === 0 && (
-          <div class="flex flex-col items-center justify-center py-16 text-slate-500 space-y-3 pl-0 border-none">
-            <AlertCircle class="w-10 h-10 opacity-30 text-cyan-400 animate-pulse" />
-            <p class="text-xs font-mono uppercase tracking-wider">No audit packets matching search filter</p>
+          <div className="flex flex-col items-center justify-center py-16 text-slate-500 space-y-3 pl-0 border-none">
+            <AlertCircle className="w-10 h-10 opacity-30 text-cyan-400 animate-pulse" />
+            <p className="text-xs font-mono uppercase tracking-wider">No audit packets matching search filter</p>
           </div>
         )}
       </div>
 
       {/* Security Disclaimer */}
-      <div class="flex items-center space-x-2.5 p-4 rounded-lg bg-cyan-950/15 border border-cyan-500/10 text-xs font-mono text-slate-400">
-        <Terminal class="w-4 h-4 text-cyan-400 shrink-0" />
+      <div className="flex items-center space-x-2.5 p-4 rounded-lg bg-cyan-950/15 border border-cyan-500/10 text-xs font-mono text-slate-400">
+        <Terminal className="w-4 h-4 text-cyan-400 shrink-0" />
         <span>System Security Alert: Logs are read-only and cryptographically verified. No deletions or edits are permitted.</span>
       </div>
     </div>

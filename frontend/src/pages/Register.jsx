@@ -94,15 +94,15 @@ const Register = () => {
           <div class="flex flex-col items-center justify-center space-y-2 mb-4">
             <div class="w-20 h-20 rounded-full border border-dashed border-violet-500/30 bg-slate-950/40 flex flex-col items-center justify-center cursor-pointer hover:border-cyan-400 transition group relative overflow-hidden">
               <Camera class="w-6 h-6 text-slate-500 group-hover:text-cyan-400 transition" />
-              <span class="text-[8px] font-mono text-slate-600 group-hover:text-cyan-400 mt-1 uppercase">Photo</span>
+              <span class="text-[10px] font-mono text-slate-600 group-hover:text-cyan-400 mt-1 uppercase">Photo</span>
             </div>
-            <span class="text-[9px] font-mono text-slate-500">UPLOAD IDENTIFICATION SHIELD</span>
+            <span class="text-xs font-mono text-slate-500">UPLOAD IDENTIFICATION SHIELD</span>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* First Name */}
             <div>
-              <label class="block text-[10px] font-mono tracking-wider text-cyan-400 uppercase mb-1.5">First Name</label>
+              <label class="block text-xs font-mono tracking-wider text-cyan-400 uppercase mb-1.5">First Name</label>
               <input
                 type="text"
                 name="first_name"
@@ -116,7 +116,7 @@ const Register = () => {
 
             {/* Last Name */}
             <div>
-              <label class="block text-[10px] font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Last Name</label>
+              <label class="block text-xs font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Last Name</label>
               <input
                 type="text"
                 name="last_name"
@@ -130,7 +130,7 @@ const Register = () => {
 
             {/* Email */}
             <div>
-              <label class="block text-[10px] font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Email Address</label>
+              <label class="block text-xs font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Email Address</label>
               <div class="relative">
                 <Mail class="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
                 <input
@@ -147,7 +147,7 @@ const Register = () => {
 
             {/* Phone Number */}
             <div>
-              <label class="block text-[10px] font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Phone Number</label>
+              <label class="block text-xs font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Phone Number</label>
               <div class="relative">
                 <Phone class="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
                 <input
@@ -164,7 +164,7 @@ const Register = () => {
 
             {/* Username */}
             <div>
-              <label class="block text-[10px] font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Uplink Username</label>
+              <label class="block text-xs font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Uplink Username</label>
               <div class="relative">
                 <User class="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
                 <input
@@ -181,7 +181,7 @@ const Register = () => {
 
             {/* Password */}
             <div>
-              <label class="block text-[10px] font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Access Passcode</label>
+              <label class="block text-xs font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Access Passcode</label>
               <input
                 type="password"
                 name="password"
@@ -195,7 +195,7 @@ const Register = () => {
 
             {/* Country */}
             <div>
-              <label class="block text-[10px] font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Country</label>
+              <label class="block text-xs font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Country</label>
               <div class="relative">
                 <Globe class="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
                 <input
@@ -212,7 +212,7 @@ const Register = () => {
 
             {/* Role select */}
             <div>
-              <label class="block text-[10px] font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Select Role</label>
+              <label class="block text-xs font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Select Role</label>
               <div class="relative">
                 <Shield class="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
                 <select
@@ -231,7 +231,7 @@ const Register = () => {
 
           {/* Additional Info */}
           <div>
-            <label class="block text-[10px] font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Additional Information</label>
+            <label class="block text-xs font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Additional Information</label>
             <textarea
               name="additional_info"
               value={formData.additional_info}

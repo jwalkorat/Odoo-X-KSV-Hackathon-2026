@@ -124,96 +124,149 @@ const Dashboard = () => {
     return user?.role || 'Officer';
   };
 
+  if (loading) {
+    return (
+      <div className="space-y-8 animate-pulse">
+        {/* Welcome Banner Skeleton */}
+        <div className="relative overflow-hidden rounded-2xl bg-slate-900/40 border border-violet-500/5 p-8 h-28 flex flex-col justify-center space-y-2">
+          <div className="h-7 w-3/4 bg-slate-800 rounded-lg"></div>
+          <div className="h-4 w-1/2 bg-slate-800 rounded-lg"></div>
+        </div>
+
+        {/* Stats Grid Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="glass-panel rounded-xl p-6 border border-violet-500/5 h-24 flex items-center justify-between">
+              <div className="space-y-2 flex-1">
+                <div className="h-3 w-16 bg-slate-800 rounded"></div>
+                <div className="h-7 w-20 bg-slate-800 rounded"></div>
+              </div>
+              <div className="w-11 h-11 bg-slate-800 rounded-lg"></div>
+            </div>
+          ))}
+        </div>
+
+        {/* Charts & Tables Grid Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 glass-panel rounded-xl border border-violet-500/5 h-96 flex flex-col justify-between overflow-hidden">
+            <div className="p-6 border-b border-violet-500/5 space-y-2">
+              <div className="h-5 w-48 bg-slate-800 rounded"></div>
+              <div className="h-3 w-36 bg-slate-800 rounded"></div>
+            </div>
+            <div className="p-6 space-y-4 flex-1">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex justify-between items-center py-2 border-b border-violet-500/5">
+                  <div className="h-4 w-24 bg-slate-800 rounded"></div>
+                  <div className="h-4 w-36 bg-slate-800 rounded"></div>
+                  <div className="h-4 w-20 bg-slate-800 rounded"></div>
+                  <div className="h-4 w-16 bg-slate-800 rounded"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="glass-panel rounded-xl p-6 border border-violet-500/5 h-96">
+            <div className="h-5 w-48 bg-slate-800 rounded mb-6"></div>
+            <div className="h-64 w-full bg-slate-900/40 rounded-lg border border-violet-500/5 flex items-end p-4">
+              <div className="w-full h-40 bg-gradient-to-t from-cyan-500/10 to-transparent rounded-lg relative overflow-hidden">
+                <div className="absolute inset-0 border-t-2 border-cyan-400/30"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div class="space-y-8">
+    <div className="space-y-8">
       {/* Welcome Banner */}
-      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-violet-900/30 via-slate-900/40 to-cyan-950/20 border border-violet-500/10 p-8">
-        <h2 class="font-outfit font-extrabold text-2xl md:text-3xl text-slate-100 mb-1">
-          Welcome back, <span class="text-cyan-400 font-mono">{getFullName()}</span> - Today's Overview
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-violet-900/30 via-slate-900/40 to-cyan-950/20 border border-violet-500/10 p-8">
+        <h2 className="font-outfit font-extrabold text-2xl md:text-3xl text-slate-100 mb-1">
+          Welcome back, <span className="text-cyan-400 font-mono">{getFullName()}</span> - Today's Overview
         </h2>
-        <p class="text-slate-400 text-xs md:text-sm font-sans tracking-wide">
-          Interfacing as <span class="text-cyan-400 font-mono font-semibold">{getDisplayRole()}</span>. Reviewing logs and managing galactic requisitions.
+        <p className="text-slate-400 text-xs md:text-sm font-sans tracking-wide">
+          Interfacing as <span className="text-cyan-400 font-mono font-semibold">{getDisplayRole()}</span>. Reviewing logs and managing galactic requisitions.
         </p>
       </div>
 
       {/* Excalidraw Stats Cards Grid */}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         
         {/* Active RFQs */}
-        <div class="glass-panel rounded-xl p-6 border border-violet-500/10 flex items-center justify-between">
+        <div className="glass-panel rounded-xl p-6 border border-violet-500/10 flex items-center justify-between">
           <div>
-            <span class="text-[10px] font-mono tracking-widest text-slate-500 uppercase">Active RFQ's</span>
-            <h3 class="text-3xl font-outfit font-bold text-slate-100 mt-1 font-mono">{stats.activeRfqs}</h3>
+            <span className="text-xs font-mono tracking-wider text-slate-400 uppercase">Active RFQs</span>
+            <h3 className="text-3xl font-outfit font-extrabold text-slate-100 mt-1">{stats.activeRfqs}</h3>
           </div>
-          <div class="p-3 bg-cyan-500/10 rounded-lg text-cyan-400">
-            <FileText class="w-5 h-5" />
+          <div className="p-3 bg-cyan-500/10 rounded-lg text-cyan-400">
+            <FileText className="w-5 h-5" />
           </div>
         </div>
 
         {/* Pending Approvals */}
-        <div class="glass-panel rounded-xl p-6 border border-violet-500/10 flex items-center justify-between">
+        <div className="glass-panel rounded-xl p-6 border border-violet-500/10 flex items-center justify-between">
           <div>
-            <span class="text-[10px] font-mono tracking-widest text-slate-500 uppercase">Pending Approvals</span>
-            <h3 class="text-3xl font-outfit font-bold text-slate-100 mt-1 font-mono">{stats.pendingApprovals}</h3>
+            <span className="text-xs font-mono tracking-wider text-slate-400 uppercase">Pending Approvals</span>
+            <h3 className="text-3xl font-outfit font-extrabold text-slate-100 mt-1">{stats.pendingApprovals}</h3>
           </div>
-          <div class="p-3 bg-amber-500/10 rounded-lg text-amber-400">
-            <CheckSquare class="w-5 h-5" />
+          <div className="p-3 bg-amber-500/10 rounded-lg text-amber-400">
+            <CheckSquare className="w-5 h-5" />
           </div>
         </div>
 
         {/* POs This Month */}
-        <div class="glass-panel rounded-xl p-6 border border-violet-500/10 flex items-center justify-between">
+        <div className="glass-panel rounded-xl p-6 border border-violet-500/10 flex items-center justify-between">
           <div>
-            <span class="text-[10px] font-mono tracking-widest text-slate-500 uppercase">PO's this month</span>
-            <h3 class="text-2xl font-outfit font-bold text-slate-100 mt-2 font-mono">
+            <span className="text-xs font-mono tracking-wider text-slate-400 uppercase">POs This Month</span>
+            <h3 className="text-3xl font-outfit font-extrabold text-slate-100 mt-1">
               {stats.posThisMonth === 230000 ? '₹ 2.3L' : formatCurrency(stats.posThisMonth)}
             </h3>
           </div>
-          <div class="p-3 bg-violet-500/10 rounded-lg text-violet-400">
-            <TrendingUp class="w-5 h-5" />
+          <div className="p-3 bg-violet-500/10 rounded-lg text-violet-400">
+            <TrendingUp className="w-5 h-5" />
           </div>
         </div>
 
         {/* Overdue Invoices */}
-        <div class="glass-panel rounded-xl p-6 border border-violet-500/10 flex items-center justify-between">
+        <div className="glass-panel rounded-xl p-6 border border-violet-500/10 flex items-center justify-between">
           <div>
-            <span class="text-[10px] font-mono tracking-widest text-slate-500 uppercase">overdue invoices</span>
-            <h3 class="text-3xl font-outfit font-bold text-slate-100 mt-1 font-mono text-red-400">{stats.overdueInvoices}</h3>
+            <span className="text-xs font-mono tracking-wider text-slate-400 uppercase">Overdue Invoices</span>
+            <h3 className="text-3xl font-outfit font-extrabold text-red-400 mt-1">{stats.overdueInvoices}</h3>
           </div>
-          <div class="p-3 bg-red-500/10 rounded-lg text-red-400">
-            <AlertTriangle class="w-5 h-5 animate-pulse" />
+          <div className="p-3 bg-red-500/10 rounded-lg text-red-400">
+            <AlertTriangle className="w-5 h-5 animate-pulse" />
           </div>
         </div>
       </div>
 
       {/* Main Content Layout Grid */}
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Recent Purchase Orders Table */}
-        <div class="lg:col-span-2 glass-panel rounded-xl border border-violet-500/10 overflow-hidden">
-          <div class="p-6 border-b border-violet-500/10">
-            <h4 class="font-outfit font-semibold text-slate-200 text-base">Recent Purchase Orders</h4>
-            <p class="text-[10px] text-slate-500 font-mono mt-0.5">LATEST REQUISITION CONTRACTS</p>
+        <div className="lg:col-span-2 glass-panel rounded-xl border border-violet-500/10 overflow-hidden flex flex-col h-full">
+          <div className="p-6 border-b border-violet-500/10">
+            <h4 className="font-outfit font-semibold text-slate-200 text-base">Recent Purchase Orders</h4>
+            <p className="text-xs text-slate-500 font-mono mt-0.5">LATEST REQUISITION CONTRACTS</p>
           </div>
           
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+          <div className="overflow-x-auto flex-1">
+            <table className="w-full text-left border-collapse">
               <thead>
-                <tr class="border-b border-violet-500/10 bg-slate-900/40 text-slate-400 text-xs font-mono uppercase">
-                  <th class="py-3.5 px-6">PO#</th>
-                  <th class="py-3.5 px-6">Vendor</th>
-                  <th class="py-3.5 px-6">Amount</th>
-                  <th class="py-3.5 px-6">Status</th>
+                <tr className="border-b border-violet-500/10 bg-slate-900/40 text-slate-400 text-xs font-mono uppercase">
+                  <th className="py-3.5 px-6">PO#</th>
+                  <th className="py-3.5 px-6">Vendor</th>
+                  <th className="py-3.5 px-6">Amount</th>
+                  <th className="py-3.5 px-6">Status</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-violet-500/5 text-sm text-slate-300">
+              <tbody className="divide-y divide-violet-500/5 text-sm text-slate-300">
                 {recentPos.map((po, index) => (
-                  <tr key={index} class="hover:bg-slate-900/20 transition duration-150">
-                    <td class="py-3.5 px-6 font-mono text-cyan-400">{po.po_number}</td>
-                    <td class="py-3.5 px-6">{po.vendor_name || (po.vendor ? po.vendor.name : 'Unknown')}</td>
-                    <td class="py-3.5 px-6 font-mono">{formatCurrency(po.total_amount)}</td>
-                    <td class="py-3.5 px-6">
-                      <span class={`px-2 py-0.5 rounded text-[10px] font-mono font-medium uppercase ${getStatusBadgeClass(po.status)}`}>
+                  <tr key={index} className="hover:bg-violet-900/20 transition-all duration-150 cursor-pointer group">
+                    <td className="py-3.5 px-6 font-mono text-cyan-400 group-hover:text-cyan-300 transition-colors duration-150 border-l-2 border-l-transparent group-hover:border-l-cyan-400">{po.po_number}</td>
+                    <td className="py-3.5 px-6 group-hover:text-slate-100 transition-colors duration-150">{po.vendor_name || (po.vendor ? po.vendor.name : 'Unknown')}</td>
+                    <td className="py-3.5 px-6 font-mono group-hover:text-slate-100 transition-colors duration-150">{formatCurrency(po.total_amount)}</td>
+                    <td className="py-3.5 px-6">
+                      <span className={`px-2 py-0.5 rounded text-xs font-mono font-medium uppercase ${getStatusBadgeClass(po.status)}`}>
                         {po.status}
                       </span>
                     </td>
@@ -225,55 +278,64 @@ const Dashboard = () => {
         </div>
 
         {/* Spend Trend Panel */}
-        <div class="glass-panel rounded-xl p-6 border border-violet-500/10">
-          <h4 class="font-outfit font-semibold text-slate-200 text-base mb-6">Spending Trends (6 Months)</h4>
-          <div class="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="glow" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.25}/>
-                    <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.02)" />
-                <XAxis dataKey="name" stroke="#64748b" fontSize={10} tickLine={false} />
-                <YAxis stroke="#64748b" fontSize={10} tickLine={false} />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#090a16', borderColor: 'rgba(6, 182, 212, 0.2)', color: '#f8fafc' }}
-                  formatter={(value) => [formatCurrency(value), 'Spend']}
-                />
-                <Area type="monotone" dataKey="spend" stroke="#06b6d4" strokeWidth={2} fillOpacity={1} fill="url(#glow)" />
-              </AreaChart>
-            </ResponsiveContainer>
+        <div className="glass-panel rounded-xl p-6 border border-violet-500/10 flex flex-col h-full justify-between">
+          <div>
+            <h4 className="font-outfit font-semibold text-slate-200 text-base mb-6">Spending Trends (6 Months)</h4>
+            <div className="h-64 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="glow" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.25}/>
+                      <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.02)" />
+                  <XAxis dataKey="name" stroke="#64748b" fontSize={10} tickLine={false} />
+                  <YAxis stroke="#64748b" fontSize={10} tickLine={false} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#090a16', 
+                      borderColor: 'rgba(6, 182, 212, 0.3)', 
+                      borderRadius: '8px',
+                      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.5)'
+                    }}
+                    itemStyle={{ color: '#22d3ee', fontFamily: 'monospace', fontSize: '12px' }}
+                    labelStyle={{ color: '#f8fafc', fontWeight: 'bold', fontFamily: 'Outfit, sans-serif' }}
+                    formatter={(value) => [formatCurrency(value), 'Spend']}
+                  />
+                  <Area type="monotone" dataKey="spend" stroke="#06b6d4" strokeWidth={2} fillOpacity={1} fill="url(#glow)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Bottom Command Buttons Layout */}
       {user?.role !== 'VENDOR' && (
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-violet-500/10 pt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-violet-500/10 pt-6">
           <button 
             onClick={() => navigate('/rfqs')}
-            class="flex items-center justify-center space-x-2 px-4 py-3 bg-slate-900 border border-violet-500/10 hover:border-cyan-400/40 rounded-xl text-xs font-mono text-cyan-400 hover:bg-slate-800/40 transition duration-200"
+            className="flex items-center justify-center space-x-2 px-4 py-3 bg-slate-900 border border-violet-500/10 hover:border-cyan-400/40 rounded-xl text-xs font-mono text-cyan-400 hover:bg-slate-800/40 transition duration-200"
           >
-            <Plus class="w-4 h-4" />
+            <Plus className="w-4 h-4" />
             <span>+ new RFQ</span>
           </button>
           
           <button 
             onClick={() => navigate('/vendors')}
-            class="flex items-center justify-center space-x-2 px-4 py-3 bg-slate-900 border border-violet-500/10 hover:border-cyan-400/40 rounded-xl text-xs font-mono text-cyan-400 hover:bg-slate-800/40 transition duration-200"
+            className="flex items-center justify-center space-x-2 px-4 py-3 bg-slate-900 border border-violet-500/10 hover:border-cyan-400/40 rounded-xl text-xs font-mono text-cyan-400 hover:bg-slate-800/40 transition duration-200"
           >
-            <Users class="w-4 h-4" />
+            <Users className="w-4 h-4" />
             <span>Add Vendor</span>
           </button>
           
           <button 
             onClick={() => navigate('/invoices')}
-            class="flex items-center justify-center space-x-2 px-4 py-3 bg-slate-900 border border-violet-500/10 hover:border-cyan-400/40 rounded-xl text-xs font-mono text-cyan-400 hover:bg-slate-800/40 transition duration-200"
+            className="flex items-center justify-center space-x-2 px-4 py-3 bg-slate-900 border border-violet-500/10 hover:border-cyan-400/40 rounded-xl text-xs font-mono text-cyan-400 hover:bg-slate-800/40 transition duration-200"
           >
-            <FileSpreadsheet class="w-4 h-4" />
+            <FileSpreadsheet className="w-4 h-4" />
             <span>View Invoices</span>
           </button>
         </div>

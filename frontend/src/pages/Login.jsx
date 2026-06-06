@@ -72,7 +72,7 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} class="space-y-4">
           <div>
-            <label class="block text-[10px] font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Pilot Username</label>
+            <label class="block text-xs font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Pilot Username</label>
             <div class="relative">
               <User class="absolute left-3 top-3 w-4 h-4 text-slate-500" />
               <input
@@ -87,7 +87,7 @@ const Login = () => {
           </div>
 
           <div>
-            <label class="block text-[10px] font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Security Code</label>
+            <label class="block text-xs font-mono tracking-wider text-cyan-400 uppercase mb-1.5">Security Code</label>
             <div class="relative">
               <Lock class="absolute left-3 top-3 w-4 h-4 text-slate-500" />
               <input
@@ -117,8 +117,8 @@ const Login = () => {
 
         {/* Demo Fast Login Shortcuts */}
         <div class="mt-8 border-t border-violet-500/10 pt-6">
-          <p class="text-[9px] font-mono tracking-wider text-slate-500 uppercase text-center mb-3">Quick Login Simulation</p>
-          <div class="grid grid-cols-2 gap-2 text-[10px]">
+          <p class="text-xs font-mono tracking-wider text-slate-500 uppercase text-center mb-3">Quick Login Simulation</p>
+          <div class="grid grid-cols-2 gap-2 text-xs">
             <button
               onClick={() => handleQuickLogin('OFFICER', 'officer', 'officer123')}
               class="px-2 py-1.5 bg-slate-900 border border-violet-500/10 hover:border-cyan-400/40 rounded text-slate-400 hover:text-slate-200 transition font-mono"
