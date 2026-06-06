@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Rocket, Lock, User, AlertTriangle } from 'lucide-react';
 
@@ -108,6 +108,11 @@ const Login = () => {
           >
             {loading ? 'Initiating Hyperdrive...' : 'Establish Connection'}
           </button>
+
+          <div class="text-center mt-4 text-xs font-mono text-slate-500">
+            <span>New Pilot? </span>
+            <Link to="/register" class="text-cyan-400 hover:text-cyan-300 hover:underline">Enroll credentials</Link>
+          </div>
         </form>
 
         {/* Demo Fast Login Shortcuts */}

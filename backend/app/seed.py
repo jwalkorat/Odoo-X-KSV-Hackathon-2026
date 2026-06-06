@@ -20,11 +20,11 @@ def seed_db():
         
         # 1. Create Users
         users_data = [
-            {"username": "admin", "email": "admin@galaxy.com", "role": "ADMIN", "password": "admin123"},
-            {"username": "officer", "email": "officer@galaxy.com", "role": "OFFICER", "password": "officer123"},
-            {"username": "manager", "email": "manager@galaxy.com", "role": "MANAGER", "password": "manager123"},
-            {"username": "vendor1", "email": "vendor1@gmail.com", "role": "VENDOR", "password": "vendor123"},
-            {"username": "vendor2", "email": "vendor2@gmail.com", "role": "VENDOR", "password": "vendor123"},
+            {"username": "admin", "email": "admin@galaxy.com", "role": "ADMIN", "password": "admin123", "first_name": "Jwal", "last_name": "Korat", "phone_number": "+91 9999999999", "country": "India"},
+            {"username": "officer", "email": "officer@galaxy.com", "role": "OFFICER", "password": "officer123", "first_name": "Deepam", "last_name": "Raval", "phone_number": "+91 9888888888", "country": "India"},
+            {"username": "manager", "email": "manager@galaxy.com", "role": "MANAGER", "password": "manager123", "first_name": "Meet", "last_name": "Madhwani", "phone_number": "+91 9777777777", "country": "India"},
+            {"username": "vendor1", "email": "vendor1@gmail.com", "role": "VENDOR", "password": "vendor123", "first_name": "Kashvi", "last_name": "Porwal", "phone_number": "+91 9666666666", "country": "India"},
+            {"username": "vendor2", "email": "vendor2@gmail.com", "role": "VENDOR", "password": "vendor123", "first_name": "Daksh", "last_name": "Patel", "phone_number": "+91 9555555555", "country": "India"},
         ]
         
         seeded_users = []
@@ -33,6 +33,10 @@ def seed_db():
                 username=u["username"],
                 email=u["email"],
                 role=u["role"],
+                first_name=u["first_name"],
+                last_name=u["last_name"],
+                phone_number=u["phone_number"],
+                country=u["country"],
                 hashed_password=get_password_hash(u["password"])
             )
             db.add(user)

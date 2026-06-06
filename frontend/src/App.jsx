@@ -3,7 +3,10 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import DashboardLayout from './layouts/DashboardLayout';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import Reports from './pages/Reports';
+import Logs from './pages/Logs';
 import { Terminal, ShieldAlert } from 'lucide-react';
 
 // Protected Route Guard (Checks if user is logged in)
@@ -77,6 +80,7 @@ const App = () => {
         <Routes>
           {/* Public Auth routes */}
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
 
           {/* Protected Dashboard console routes */}
@@ -165,16 +169,24 @@ const App = () => {
             }
           />
           <Route
+            path="/reports"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['ADMIN', 'OFFICER', 'MANAGER']}>
+                  <DashboardLayout>
+                    <Reports />
+                  </DashboardLayout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/logs"
             element={
               <ProtectedRoute>
                 <RoleGuard allowedRoles={['ADMIN', 'OFFICER']}>
                   <DashboardLayout>
-                    <WIPPage 
-                      title="Activity Audit Logs" 
-                      assignee="Person 1 (Team Leader)" 
-                      details="Review complete system logs, query by log types (RFQ, Approval, Invoice, User actions) and inspect transaction history."
-                    />
+                    <Logs />
                   </DashboardLayout>
                 </RoleGuard>
               </ProtectedRoute>

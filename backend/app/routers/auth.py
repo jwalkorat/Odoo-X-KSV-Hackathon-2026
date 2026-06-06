@@ -26,6 +26,11 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
         username=user_in.username,
         email=user_in.email,
         role=user_in.role.upper(), # Force uppercase roles (OFFICER, VENDOR, MANAGER, ADMIN)
+        first_name=user_in.first_name,
+        last_name=user_in.last_name,
+        phone_number=user_in.phone_number,
+        country=user_in.country,
+        additional_info=user_in.additional_info,
         hashed_password=hashed_password
     )
     db.add(db_user)

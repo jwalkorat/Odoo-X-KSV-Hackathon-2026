@@ -9,9 +9,21 @@ from ..auth import get_current_user
 router = APIRouter(prefix="/api/logs", tags=["Activity Logs"])
 
 @router.get("/", response_model=List[ActivityLogResponse])
-def get_logs(limit: int = 50, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-    # Simple log fetcher
-    return db.query(ActivityLog).order_by(ActivityLog.created_at.desc()).limit(limit).all()
+def get_logs(
+    entity_type: Optional[str] = None,
+    limit: int = 50,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    query = db.query(ActivityLog)
+    if entity_type and entity_type.lower() != 'all':
+        et = entity_type.upper()
+        # Handle plural-to-singular conversions (e.g. APPROVALS -> APPROVAL)
+        if et.endswith('S') and et != 'STATUS':
+            et = et[:-1]
+        query = query.filter(ActivityLog.entity_type == et)
+        
+    return query.order_by(ActivityLog.created_at.desc()).limit(limit).all()
 
 def log_activity(db: Session, user_id: int, action: str, entity_type: str, entity_id: Optional[int] = None, metadata_str: Optional[str] = None):
     log_entry = ActivityLog(

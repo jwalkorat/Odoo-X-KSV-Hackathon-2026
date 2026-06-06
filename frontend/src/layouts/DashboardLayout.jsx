@@ -11,7 +11,8 @@ import {
   LogOut, 
   Activity, 
   User as UserIcon,
-  Shield
+  Shield,
+  BarChart2
 } from 'lucide-react';
 
 const DashboardLayout = ({ children }) => {
@@ -31,6 +32,7 @@ const DashboardLayout = ({ children }) => {
     { name: 'Approvals', path: '/approvals', icon: CheckSquare, roles: ['ADMIN', 'MANAGER'] },
     { name: 'Purchase Orders', path: '/purchase-orders', icon: ShoppingBag, roles: ['ADMIN', 'OFFICER', 'MANAGER', 'VENDOR'] },
     { name: 'Invoices', path: '/invoices', icon: FileSpreadsheet, roles: ['ADMIN', 'OFFICER', 'MANAGER', 'VENDOR'] },
+    { name: 'Reports', path: '/reports', icon: BarChart2, roles: ['ADMIN', 'OFFICER', 'MANAGER'] },
     { name: 'Activity Log', path: '/logs', icon: Activity, roles: ['ADMIN', 'OFFICER'] }
   ];
 
