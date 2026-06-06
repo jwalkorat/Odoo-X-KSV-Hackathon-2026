@@ -1,4 +1,4 @@
-# 🌌 VendorBridge (Procurement Galaxy ERP)
+# <img width="56" height="61" alt="image" src="https://github.com/user-attachments/assets/02634a94-9267-491a-8523-04a981f56c8b" />VendorBridge (Procurement Galaxy ERP)
 
 **VendorBridge (Procurement Galaxy)** is a centralized, role-based ERP designed to streamline and digitize modern procurement operations. Built with a high-fidelity, space-themed cosmic interface and robust clean architecture, the platform enables organizations to register vendors, manage Request for Quotations (RFQs), evaluate quotations, execute multi-role approvals, issue Purchase Orders (POs), and track invoices seamlessly.
 
