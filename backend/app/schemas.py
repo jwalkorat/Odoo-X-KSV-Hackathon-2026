@@ -123,10 +123,33 @@ class QuotationResponse(QuotationBase):
     id: int
     submitted_at: datetime
     items: List[QuotationItemResponse] = []
+    vendor: Optional[VendorResponse] = None
 
     class Config:
         from_attributes = True
 
+class RFQMiniResponse(BaseModel):
+    id: int
+    title: str
+    status: str
+    class Config:
+        from_attributes = True
+
+class VendorMiniResponse(BaseModel):
+    id: int
+    name: str
+    rating: float
+    class Config:
+        from_attributes = True
+
+class QuotationMiniResponse(BaseModel):
+    id: int
+    total_amount: float
+    delivery_days: int
+    notes: Optional[str] = None
+    vendor: VendorMiniResponse
+    class Config:
+        from_attributes = True
 
 # ==================== APPROVAL SCHEMAS ====================
 class ApprovalBase(BaseModel):
@@ -148,6 +171,8 @@ class ApprovalResponse(ApprovalBase):
     remarks: Optional[str] = None
     created_at: datetime
     resolved_at: Optional[datetime] = None
+    rfq: Optional[RFQMiniResponse] = None
+    quotation: Optional[QuotationMiniResponse] = None
 
     class Config:
         from_attributes = True
@@ -180,6 +205,11 @@ class InvoiceBase(BaseModel):
     tax_amount: float
     total: float
     status: str
+
+class InvoiceCreate(BaseModel):
+    po_id: int
+    subtotal: float
+    tax_percent: float = 18.0
 
 class InvoiceResponse(InvoiceBase):
     id: int

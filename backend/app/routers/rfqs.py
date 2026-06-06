@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
+import datetime
 from ..database import get_db
 from ..models import RFQ, RFQItem, RFQVendor, Quotation, QuotationItem
 from ..schemas import RFQCreate, RFQResponse, QuotationCreate, QuotationResponse
@@ -87,13 +88,50 @@ def submit_quotation(
     if not rfq:
         raise HTTPException(status_code=404, detail="RFQ not found")
         
+    # Check if a quotation already exists for this vendor and RFQ (Upsert logic)
+    existing_quote = db.query(Quotation).filter(
+        Quotation.rfq_id == rfq_id,
+        Quotation.vendor_id == quote_in.vendor_id
+    ).first()
+
+    if existing_quote:
+        existing_quote.total_amount = quote_in.total_amount
+        existing_quote.delivery_days = quote_in.delivery_days
+        existing_quote.notes = quote_in.notes
+        existing_quote.status = "SUBMITTED"
+        existing_quote.submitted_at = datetime.datetime.utcnow()
+
+        # Delete existing line items
+        db.query(QuotationItem).filter(QuotationItem.quotation_id == existing_quote.id).delete()
+
+        # Create new line items
+        for item in quote_in.items:
+            db_item = QuotationItem(
+                quotation_id=existing_quote.id,
+                rfq_item_id=item.rfq_item_id,
+                unit_price=item.unit_price,
+                total_price=item.total_price
+            )
+            db.add(db_item)
+
+        # Update RFQ-Vendor status
+        link = db.query(RFQVendor).filter(RFQVendor.rfq_id == rfq_id, RFQVendor.vendor_id == quote_in.vendor_id).first()
+        if link:
+            link.status = "RESPONDED"
+
+        db.commit()
+        db.refresh(existing_quote)
+        return existing_quote
+
+    # Create new quotation
     db_quote = Quotation(
         rfq_id=rfq_id,
         vendor_id=quote_in.vendor_id,
         total_amount=quote_in.total_amount,
         delivery_days=quote_in.delivery_days,
         notes=quote_in.notes,
-        status="SUBMITTED"
+        status="SUBMITTED",
+        submitted_at=datetime.datetime.utcnow()
     )
     db.add(db_quote)
     db.commit()
@@ -116,3 +154,47 @@ def submit_quotation(
     db.commit()
     db.refresh(db_quote)
     return db_quote
+
+@router.get("/{rfq_id}/quotes", response_model=List[QuotationResponse])
+def get_rfq_quotations(
+    rfq_id: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    rfq = db.query(RFQ).filter(RFQ.id == rfq_id).first()
+    if not rfq:
+        raise HTTPException(status_code=404, detail="RFQ not found")
+    
+    # Vendors should only see their own quote
+    if current_user.role == "VENDOR":
+        return db.query(Quotation).filter(
+            Quotation.rfq_id == rfq_id,
+            Quotation.vendor_id == current_user.id
+        ).all()
+        
+    return db.query(Quotation).filter(Quotation.rfq_id == rfq_id).all()
+
+@router.get("/quotes/all", response_model=List[QuotationResponse])
+def get_all_quotations(
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    if current_user.role == "VENDOR":
+        return db.query(Quotation).filter(Quotation.vendor_id == current_user.id).all()
+    return db.query(Quotation).all()
+
+@router.get("/quotes/{quote_id}", response_model=QuotationResponse)
+def get_quotation(
+    quote_id: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    quote = db.query(Quotation).filter(Quotation.id == quote_id).first()
+    if not quote:
+        raise HTTPException(status_code=404, detail="Quotation not found")
+        
+    # Vendor permission check
+    if current_user.role == "VENDOR" and quote.vendor_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Clearance level insufficient to view this quotation")
+        
+    return quote
