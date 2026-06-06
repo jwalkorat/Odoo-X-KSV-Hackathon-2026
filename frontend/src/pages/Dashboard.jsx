@@ -67,25 +67,14 @@ const Dashboard = () => {
         const overdueI = invoicesRes.data.filter(i => i.status === 'DRAFT').length; // Map draft to unpaid/overdue simulation
 
         setStats({
-          activeRfqs: activeR || 12,
-          pendingApprovals: pendingA || 5,
-          posThisMonth: totalPOVal || 230000,
-          overdueInvoices: overdueI || 3
+          activeRfqs: activeR,
+          pendingApprovals: pendingA,
+          posThisMonth: totalPOVal,
+          overdueInvoices: overdueI
         });
 
-        // Use backend POs if they exist
-        if (ordersRes.data.length > 0) {
-          setRecentPos(ordersRes.data.slice(0, 4));
-        } else {
-          setRecentPos(getMockRecentPOs());
-        }
-
-        // Recent Invoices
-        if (invoicesRes.data.length > 0) {
-          setRecentInvoices(invoicesRes.data.slice(0, 4));
-        } else {
-          setRecentInvoices(getMockRecentInvoices());
-        }
+        setRecentPos(ordersRes.data.slice(0, 4));
+        setRecentInvoices(invoicesRes.data.slice(0, 4));
 
         setLogs(logsRes.data.slice(0, 5));
       } catch (err) {
@@ -274,7 +263,9 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-violet-500/5 text-sm text-slate-300">
-                {recentPos.map((po, index) => (
+                {recentPos.length === 0 ? (
+                  <tr><td colSpan={4} className="py-6 text-center text-xs text-slate-500 font-mono">No purchase orders issued yet</td></tr>
+                ) : recentPos.map((po, index) => (
                   <tr key={index} onClick={() => navigate('/purchase-orders')} className="hover:bg-violet-900/20 transition-all duration-150 cursor-pointer group">
                     <td className="py-3 px-6 font-mono text-cyan-400 group-hover:text-cyan-300 transition-colors border-l-2 border-l-transparent group-hover:border-l-cyan-400">{po.po_number}</td>
                     <td className="py-3 px-6 group-hover:text-slate-100 transition-colors">{po.vendor_name || (po.vendor ? po.vendor.name : 'Unknown')}</td>
