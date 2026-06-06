@@ -142,7 +142,12 @@ class RFQCreate(RFQBase):
     @field_validator("deadline")
     @classmethod
     def validate_deadline(cls, value: datetime) -> datetime:
-        if value <= datetime.utcnow():
+        from datetime import timezone
+        if value.tzinfo is not None:
+            now = datetime.now(timezone.utc)
+        else:
+            now = datetime.utcnow()
+        if value <= now:
             raise ValueError("Deadline must be in the future")
         return value
 
