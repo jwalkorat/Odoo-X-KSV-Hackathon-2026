@@ -23,7 +23,9 @@ def serialize_rfq(rfq: RFQ) -> RFQ:
 @router.get("/", response_model=List[RFQResponse])
 def get_rfqs(status: Optional[str] = None, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     if current_user.role == "VENDOR":
-        query = db.query(RFQ).join(RFQVendor).filter(RFQVendor.vendor_id == current_user.id)
+        vendor = db.query(Vendor).filter(Vendor.contact_email == current_user.email).first()
+        vendor_id = vendor.id if vendor else -1
+        query = db.query(RFQ).join(RFQVendor).filter(RFQVendor.vendor_id == vendor_id)
     else:
         query = db.query(RFQ)
         

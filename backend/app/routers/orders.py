@@ -28,7 +28,9 @@ def populate_invoice_details(inv: Invoice) -> Invoice:
 @router.get("/purchase-orders", response_model=List[PurchaseOrderResponse])
 def get_purchase_orders(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     if current_user.role == "VENDOR":
-        pos = db.query(PurchaseOrder).filter(PurchaseOrder.vendor_id == current_user.id).all()
+        vendor = db.query(Vendor).filter(Vendor.contact_email == current_user.email).first()
+        vendor_id = vendor.id if vendor else -1
+        pos = db.query(PurchaseOrder).filter(PurchaseOrder.vendor_id == vendor_id).all()
     else:
         pos = db.query(PurchaseOrder).all()
     return [populate_po_details(po) for po in pos]
@@ -67,7 +69,9 @@ def update_po_status(
 @router.get("/invoices", response_model=List[InvoiceResponse])
 def get_invoices(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     if current_user.role == "VENDOR":
-        invoices = db.query(Invoice).filter(Invoice.vendor_id == current_user.id).all()
+        vendor = db.query(Vendor).filter(Vendor.contact_email == current_user.email).first()
+        vendor_id = vendor.id if vendor else -1
+        invoices = db.query(Invoice).filter(Invoice.vendor_id == vendor_id).all()
     else:
         invoices = db.query(Invoice).all()
     return [populate_invoice_details(inv) for inv in invoices]
